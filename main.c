@@ -31,7 +31,9 @@ void allocate_coordinates_arrays(double **shear, double **stretch, double **stag
 }
 
 int main() {
-    //todo strand_len, snapshot_len global variable
+    //todo switch frames
+    //todo read arguments from command line
+    //todo n pdb files
     FILE *fp = fopen("../teplota.300.pdb.1", "r"); // ../ for running in ide, without for running in terminal
     if(fp == NULL){
         printf("Error: Input file not found!");
@@ -45,9 +47,6 @@ int main() {
     double *shear, *stretch, *stagger, *buckle, *propeller, *opening, *shift, *slide, *rise, *roll, *tilt, *twist;
     allocate_coordinates_arrays(&shear, &stretch, &stagger, &buckle, &propeller, &opening, &shift, &slide, &rise,
                                 &roll, &tilt, &twist);
-
-
-    //todo switch frames
-
+    //todo run functions for 3dna, curves, cgdna
     return 0;
 }
