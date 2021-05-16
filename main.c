@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "frame_fitting.h"
+#include "curves_coordinates.h"
 
 void allocate_frames_and_origins(double (**frames_1)[3][3], double (**frames_2)[3][3], double (**origins_1)[3],
                                  double (**origins_2)[3]){
@@ -31,7 +32,6 @@ void allocate_coordinates_arrays(double **shear, double **stretch, double **stag
 }
 
 int main() {
-    //todo switch frames
     //todo read arguments from command line
     //todo n pdb files
     FILE *fp = fopen("../teplota.300.pdb.1", "r"); // ../ for running in ide, without for running in terminal
@@ -43,10 +43,16 @@ int main() {
     double (*frames_strand_1)[3][3], (*frames_strand_2)[3][3], (*origins_strand_1)[3], (*origins_strand_2)[3];
     allocate_frames_and_origins(&frames_strand_1, &frames_strand_2, &origins_strand_1, &origins_strand_2);
     fit_frames(fp, frames_strand_1, frames_strand_2, origins_strand_1, origins_strand_2);
+    //todo switch frames
+    //todo ortonormalize frames
 
     double *shear, *stretch, *stagger, *buckle, *propeller, *opening, *shift, *slide, *rise, *roll, *tilt, *twist;
     allocate_coordinates_arrays(&shear, &stretch, &stagger, &buckle, &propeller, &opening, &shift, &slide, &rise,
                                 &roll, &tilt, &twist);
     //todo run functions for 3dna, curves, cgdna
+
+    get_curves_coordinates(frames_strand_1, frames_strand_2, origins_strand_1, origins_strand_2, shear, stretch,
+                           stagger, buckle, propeller, opening, shift, slide, rise, roll, tilt, twist);
+
     return 0;
 }

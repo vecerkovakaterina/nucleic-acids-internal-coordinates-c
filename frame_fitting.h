@@ -556,7 +556,7 @@ void rotate_strand_2_x_180_deg(double rotated[][3][3], double to_rotate[][3][3],
     }
 }
 
-void free_arrays(double cm[][3][3], double sm[][4][4], double rm[][3][3], double o[][3], double fr[][3][3]){
+void free_frame_fitting_arrays(double cm[][3][3], double sm[][4][4], double rm[][3][3], double o[][3], double fr[][3][3]){
     free(cm); free(sm); free(rm); free(o); free(fr);
 }
 
@@ -592,7 +592,7 @@ void fit_frames(FILE *fp, double frames_strand_1[][3][3], double frames_strand_2
                                 origins_strand_1, origins_strand_2, strand_len);
 
     rotate_strand_2_x_180_deg(frames_strand_2, frames_strand_2_to_rotate, strand_len);
-    free_arrays(covariance_matrices, symmetric_matrices, rotation_matrices, origins, frames_strand_2_to_rotate);
+    free_frame_fitting_arrays(covariance_matrices, symmetric_matrices, rotation_matrices, origins, frames_strand_2_to_rotate);
 }
 
 #ifdef CMAKE_FINAL_THESIS_C_FRAME_FITTING_H
