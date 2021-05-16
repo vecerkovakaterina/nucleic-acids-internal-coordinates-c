@@ -556,7 +556,83 @@ void rotate_strand_2_x_180_deg(double rotated[][3][3], double to_rotate[][3][3],
     }
 }
 
-#ifndef CMAKE_FINAL_THESIS_C_FRAME_FITTING_H
-#define CMAKE_FINAL_THESIS_C_FRAME_FITTING_H
+void free_arrays(double cm[][3][3], double sm[][4][4], double rm[][3][3], double o[][3], double fr[][3][3]){
+    free(cm); free(sm); free(rm); free(o); free(fr);
+}
+
+void fit_frames(FILE *fp, double frames_strand_1[][3][3], double frames_strand_2[][3][3], double origins_strand_1[][3],
+                double origins_strand_2[][3]){
+
+    residuum snapshot[SNAPSHOT_ARRAY_LENGTH];
+    read_file(fp, snapshot);
+    fclose(fp);
+
+    purine standard_G, standard_A;
+    pyrimidine standard_C, standard_T, standard_U;
+    create_standard_frames(&standard_G, &standard_A, &standard_C, &standard_T, &standard_U);
+
+    double (*covariance_matrices)[3][3] = malloc(snapshot_len * sizeof(*covariance_matrices));
+    get_covariance_matrices(covariance_matrices, snapshot, snapshot_len, standard_A, standard_G, standard_C, standard_T,
+                            standard_U);
+
+    double (*symmetric_matrices)[4][4] = malloc(snapshot_len * sizeof(*symmetric_matrices));
+    get_symmetric_matrices(symmetric_matrices, covariance_matrices, snapshot_len);
+
+    double (*rotation_matrices)[3][3] = malloc(snapshot_len * sizeof(*rotation_matrices));
+    get_rotation_matrices(rotation_matrices, symmetric_matrices, snapshot_len);
+
+    double (*origins)[3] = malloc(snapshot_len * sizeof(*origins));
+    get_rotation_matrices_origins(origins, snapshot, rotation_matrices, snapshot_len, standard_A, standard_G,
+                                  standard_C, standard_T, standard_U);
+
+    int strand_len = snapshot_len / 2;
+    double (*frames_strand_2_to_rotate)[3][3] = malloc(strand_len * sizeof(*frames_strand_2_to_rotate));
+
+    split_snapshot_into_strands(rotation_matrices, origins, frames_strand_1, frames_strand_2_to_rotate,
+                                origins_strand_1, origins_strand_2, strand_len);
+
+    rotate_strand_2_x_180_deg(frames_strand_2, frames_strand_2_to_rotate, strand_len);
+    free_arrays(covariance_matrices, symmetric_matrices, rotation_matrices, origins, frames_strand_2_to_rotate);
+}
+
+#ifdef CMAKE_FINAL_THESIS_C_FRAME_FITTING_H
+
+int main() {
+
+    FILE *fp = fopen("../teplota.300.pdb.1", "r"); // ../ for running in ide, without for running in terminal
+    residuum snapshot[SNAPSHOT_ARRAY_LENGTH];
+    read_file(fp, snapshot);
+    fclose(fp);
+
+    purine standard_G, standard_A;
+    pyrimidine standard_C, standard_T, standard_U;
+    create_standard_frames(&standard_G, &standard_A, &standard_C, &standard_T, &standard_U);
+
+    double (*covariance_matrices)[3][3] = malloc(snapshot_len * sizeof(*covariance_matrices));
+    get_covariance_matrices(covariance_matrices, snapshot, snapshot_len, standard_A, standard_G, standard_C, standard_T,
+                            standard_U);
+
+    double (*symmetric_matrices)[4][4] = malloc(snapshot_len * sizeof(*symmetric_matrices));
+    get_symmetric_matrices(symmetric_matrices, covariance_matrices, snapshot_len);
+
+    double (*rotation_matrices)[3][3] = malloc(snapshot_len * sizeof(*rotation_matrices));
+    get_rotation_matrices(rotation_matrices, symmetric_matrices, snapshot_len);
+
+    double (*origins)[3] = malloc(snapshot_len * sizeof(*origins));
+    get_rotation_matrices_origins(origins, snapshot, rotation_matrices, snapshot_len, standard_A, standard_G,
+                                  standard_C, standard_T, standard_U);
+
+    int strand_len = snapshot_len / 2;
+    double (*frames_strand_1)[3][3] = malloc(strand_len * sizeof(*frames_strand_1));
+    double (*frames_strand_2_to_rotate)[3][3] = malloc(strand_len * sizeof(*frames_strand_2_to_rotate));
+    double (*origins_strand_1)[3] = malloc(strand_len * sizeof(*origins_strand_1));
+    double (*origins_strand_2)[3] = malloc(strand_len * sizeof(*origins_strand_2));
+    split_snapshot_into_strands(rotation_matrices, origins, frames_strand_1, frames_strand_2_to_rotate,
+                                origins_strand_1, origins_strand_2, strand_len);
+
+    double (*frames_strand_2)[3][3] = malloc(strand_len * sizeof(*frames_strand_2));
+    rotate_strand_2_x_180_deg(frames_strand_2, frames_strand_2_to_rotate, strand_len);
+
+    return 0;
 
 #endif //CMAKE_FINAL_THESIS_C_FRAME_FITTING_H
