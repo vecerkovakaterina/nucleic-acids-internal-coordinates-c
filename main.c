@@ -50,7 +50,6 @@ int main() {
     double *shear, *stretch, *stagger, *buckle, *propeller, *opening, *shift, *slide, *rise, *roll, *tilt, *twist;
     allocate_coordinates_arrays(&shear, &stretch, &stagger, &buckle, &propeller, &opening, &shift, &slide, &rise,
                                 &roll, &tilt, &twist);
-    //todo run functions for 3dna
 
     char coords_type[10] = "3dna";
 
@@ -62,9 +61,13 @@ int main() {
                               stagger, buckle, propeller, opening, shift, slide, rise, roll, tilt, twist);
     } else if (strcmp(coords_type, "3dna") == 0) {
         get_3dna_coordinates(frames_strand_1, frames_strand_2, origins_strand_1, origins_strand_2, shear, stretch,
-                              stagger, buckle, propeller, opening, shift, slide, rise, roll, tilt, twist);
+                             stagger, buckle, propeller, opening, shift, slide, rise, roll, tilt, twist);
     }
 
+    for (int i = 0; i < 32; i++) {
+        printf("%lf %lf %lf %lf %lf %lf\n", shear[i], stretch[i], stagger[i], buckle[i], propeller[i], opening[i]);
+    }
+    printf("\n");
     for (int i = 0; i < 32; i++) {
         printf("%lf %lf %lf %lf %lf %lf\n", shift[i], slide[i], rise[i], roll[i], tilt[i], twist[i]);
     }
