@@ -4,33 +4,14 @@
 #include <math.h>
 
 void curves_get_rotation_matrices(double intra_rotation_matrices[][3][3],
-                           double frames_1[][3][3],
-                           double frames_2[][3][3],
-                           int strand_len) {
+                                  double frames_1[][3][3],
+                                  double frames_2[][3][3],
+                                  int strand_len) {
 
     for (int i = 0; i < strand_len; i++) {
         double frame_2_transposed[3][3];
         transpose_matrix(3, 3, frame_2_transposed, frames_2[i]);
         matrix_multiplication(3, 3, 3, intra_rotation_matrices[i], frames_1[i], frame_2_transposed);
-    }
-}
-
-void normalize_matrix_columns(int m, int len, double matrices[][m][3]) {
-    for (int i = 0; i < len; i++) {
-
-        double x_magnitude = matrix_column_magnitude(3, 3, matrices[i], 0);
-        double y_magnitude = matrix_column_magnitude(3, 3, matrices[i], 1);
-        double z_magnitude = matrix_column_magnitude(3, 3, matrices[i], 2);
-
-        for (int j = 0; j < m; j++) {
-            matrices[i][j][0] = matrices[i][j][0] / x_magnitude;
-        }
-        for (int j = 0; j < m; j++) {
-            matrices[i][j][1] = matrices[i][j][1] / y_magnitude;
-        }
-        for (int j = 0; j < m; j++) {
-            matrices[i][j][2] = matrices[i][j][2] / z_magnitude;
-        }
     }
 }
 
@@ -173,8 +154,17 @@ void get_inter_rotational_coords(double *roll, double *tilt, double *twist, cons
 }
 
 void free_curves_arrays(double irm[][3][3], double ta[], double ua[][3], double imf[][3][3], double imfo[][3],
-                        double erm[][3][3], double te[], double ue[][3], double emf[][3][3], double emfo[][3]){
-    free(irm); free(ta); free(ua); free(imf); free(imfo); free(erm); free(te); free(ue); free(emf); free(emfo);
+                        double erm[][3][3], double te[], double ue[][3], double emf[][3][3], double emfo[][3]) {
+    free(irm);
+    free(ta);
+    free(ua);
+    free(imf);
+    free(imfo);
+    free(erm);
+    free(te);
+    free(ue);
+    free(emf);
+    free(emfo);
 }
 
 //todo separate into functinos
