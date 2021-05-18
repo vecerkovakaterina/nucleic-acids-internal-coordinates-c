@@ -53,15 +53,15 @@ int main() {
 
     char coords_type[10] = "3dna";
 
-    if (strcmp(coords_type, "curves") == 0) {
+    if (strcmp(coords_type, "3dna") == 0) {
+        get_3dna_coordinates(frames_strand_1, frames_strand_2, origins_strand_1, origins_strand_2, shear, stretch,
+                             stagger, buckle, propeller, opening, shift, slide, rise, roll, tilt, twist);
+    } else if (strcmp(coords_type, "curves") == 0) {
         get_curves_coordinates(frames_strand_1, frames_strand_2, origins_strand_1, origins_strand_2, shear, stretch,
                                stagger, buckle, propeller, opening, shift, slide, rise, roll, tilt, twist);
     } else if (strcmp(coords_type, "cgdna") == 0) {
         get_cgdna_coordinates(frames_strand_1, frames_strand_2, origins_strand_1, origins_strand_2, shear, stretch,
                               stagger, buckle, propeller, opening, shift, slide, rise, roll, tilt, twist);
-    } else if (strcmp(coords_type, "3dna") == 0) {
-        get_3dna_coordinates(frames_strand_1, frames_strand_2, origins_strand_1, origins_strand_2, shear, stretch,
-                             stagger, buckle, propeller, opening, shift, slide, rise, roll, tilt, twist);
     }
 
     for (int i = 0; i < 32; i++) {
