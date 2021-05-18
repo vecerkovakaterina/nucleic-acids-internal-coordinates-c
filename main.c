@@ -33,9 +33,32 @@ void allocate_coordinates_arrays(double **shear, double **stretch, double **stag
     *twist = (double *) malloc(inter_len * sizeof(**twist));
 }
 
-int main() {
+int main(int argc, char *argv[]) {
     //todo read arguments from command line
     //todo n pdb files
+
+    if (argc != 5) {
+        printf("USAGE: ./coordinates [3dna|curves|cgdna] number_of_snapshots pdb_files_path output_files_path\n");
+        return 0;
+    }
+
+    char coords_type[10] = "3dna";
+    strcpy(coords_type, argv[1]);
+    char *ptr;
+    long number_snapshots = strtol(argv[2], &ptr, 10);
+    char input_path[30] = "./";
+    strcpy(input_path, argv[3]);
+    char output_path[30] = "./";
+    strcpy(output_path, argv[4]);
+
+    //parse filename
+    char *filename = strrchr( input_path, '/');
+    filename++;
+
+    printf("coords type: %s, number of snapshots: %ld, input path: %s, output path: %s, filename: %s\n",
+           coords_type, number_snapshots, input_path, output_path, filename);
+
+    /*
     FILE *fp = fopen("../teplota.300.pdb.1", "r"); // ../ for running in ide, without for running in terminal
     if (fp == NULL) {
         printf("Error: Input file not found!");
@@ -50,8 +73,6 @@ int main() {
     double *shear, *stretch, *stagger, *buckle, *propeller, *opening, *shift, *slide, *rise, *roll, *tilt, *twist;
     allocate_coordinates_arrays(&shear, &stretch, &stagger, &buckle, &propeller, &opening, &shift, &slide, &rise,
                                 &roll, &tilt, &twist);
-
-    char coords_type[10] = "3dna";
 
     if (strcmp(coords_type, "3dna") == 0) {
         get_3dna_coordinates(frames_strand_1, frames_strand_2, origins_strand_1, origins_strand_2, shear, stretch,
@@ -71,6 +92,6 @@ int main() {
     for (int i = 0; i < 32; i++) {
         printf("%lf %lf %lf %lf %lf %lf\n", shift[i], slide[i], rise[i], roll[i], tilt[i], twist[i]);
     }
-
+*/
     return 0;
 }
