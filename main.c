@@ -4,6 +4,13 @@
 #include "cgdna_coordinates.h"
 #include "3dna_coordinates.h"
 
+/**
+ * Allocate memory space for frames and origins arrays
+ * @param frames_1 pointer to an array of frames in strand I
+ * @param frames_2 pointer to an array of frames in strand II
+ * @param origins_1 pointer pointer to an array of origins of frames in strand I
+ * @param origins_2 pointer pointer to an array of origins of frames in strand II
+ */
 void allocate_frames_and_origins(double (**frames_1)[3][3], double (**frames_2)[3][3], double (**origins_1)[3],
                                  double (**origins_2)[3]) {
     *frames_1 = malloc(SNAPSHOT_ARRAY_LENGTH * sizeof(**frames_1));
@@ -12,6 +19,21 @@ void allocate_frames_and_origins(double (**frames_1)[3][3], double (**frames_2)[
     *origins_2 = malloc(SNAPSHOT_ARRAY_LENGTH * sizeof(**origins_2));
 }
 
+/**
+ * Allocate memory space for arrays to be filled with relative coordinates values
+ * @param shear array pointer
+ * @param stretch array pointer
+ * @param stagger array pointer
+ * @param buckle array pointer
+ * @param propeller array pointer
+ * @param opening array pointer
+ * @param shift array pointer
+ * @param slide array pointer
+ * @param rise array pointer
+ * @param roll array pointer
+ * @param tilt array pointer
+ * @param twist array pointer
+ */
 void allocate_coordinates_arrays(double **shear, double **stretch, double **stagger, double **buckle,
                                  double **propeller, double **opening, double **shift, double **slide,
                                  double **rise, double **roll, double **tilt, double **twist) {
@@ -33,6 +55,11 @@ void allocate_coordinates_arrays(double **shear, double **stretch, double **stag
     *twist = (double *) malloc(inter_len * sizeof(**twist));
 }
 
+/**
+ * Run the computation of 3DNA definition of internal coordinates
+ * @param filename input pdb file with snapshot
+ * @return value computation successful (0) or file not found (1)
+ */
 int run_3dna(char filename[]){
     FILE *fp = fopen(filename, "r");
     if (fp == NULL) {
@@ -55,6 +82,11 @@ int run_3dna(char filename[]){
     return 0;
 }
 
+/**
+ * Run the computation of Curves+ definition of internal coordinates
+ * @param filename input pdb file with snapshot
+ * @return value computation successful (0) or file not found (1)
+ */
 int run_curves(char filename[]){
     FILE *fp = fopen(filename, "r");
     if (fp == NULL) {
@@ -77,6 +109,11 @@ int run_curves(char filename[]){
     return 0;
 }
 
+/**
+ * Run the computation of cgDNA definition of internal coordinates
+ * @param filename input pdb file with snapshot
+ * @return value computation successful (0) or file not found (1)
+ */
 int run_cgdna(char filename[]){
     FILE *fp = fopen(filename, "r");
     if (fp == NULL) {
@@ -128,8 +165,8 @@ int main(int argc, char *argv[]) {
         }
     } else if (strcmp(coords_type, "curves") == 0) {
         for(int i = 1; i <= number_snapshots; i++){
-            char filename_number[31] = "";
-            snprintf(filename_number, 30, "%s%d", input_path, i);
+            char filename_number[101] = "";
+            snprintf(filename_number, 100, "%s%d", input_path, i);
 
             if(run_curves(filename_number) == 1){
                 return 1;
@@ -137,14 +174,13 @@ int main(int argc, char *argv[]) {
         }
     } else if (strcmp(coords_type, "cgdna") == 0) {
         for(int i = 1; i <= number_snapshots; i++){
-            char filename_number[31] = "";
-            snprintf(filename_number, 30, "%s%d", input_path, i);
+            char filename_number[101] = "";
+            snprintf(filename_number, 100, "%s%d", input_path, i);
 
             if(run_cgdna(filename_number) == 1){
                 return 1;
             }
         }
     }
-
     return 0;
 }

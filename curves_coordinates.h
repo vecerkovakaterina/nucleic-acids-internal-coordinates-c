@@ -3,6 +3,13 @@
 #include <string.h>
 #include <math.h>
 
+/**
+ * Compute rotation matrices describing rotation between neighbouring base frames
+ * @param intra_rotation_matrices the array allocated for rotation matrices
+ * @param frames_1 the array of base frames in strand 1
+ * @param frames_2 the array of base frames in strand 2
+ * @param strand_len the length of one strand
+ */
 void curves_get_rotation_matrices(double intra_rotation_matrices[][3][3],
                                   double frames_1[][3][3],
                                   double frames_2[][3][3],
@@ -15,6 +22,11 @@ void curves_get_rotation_matrices(double intra_rotation_matrices[][3][3],
     }
 }
 
+/**
+ * Orthonormalize an array of frame matrices
+ * @param frame the array of frames to be orthonormalized
+ * @param len the length of one strand
+ */
 void gram_schmidt_columns(double frame[][3][3], int len) {
 
     for (int i = 0; i < len; i++) {
@@ -52,12 +64,24 @@ void gram_schmidt_columns(double frame[][3][3], int len) {
 
 }
 
+/**
+ * Compute the rotation angle in degrees
+ * @param theta the array allocated for theta values
+ * @param rotation_matrices the array of rotation matrices
+ * @param len the length of one strand
+ */
 void get_rotation_angle_theta(double *theta, double rotation_matrices[][3][3], int len) {
     for (int i = 0; i < len; i++) {
         theta[i] = radians_to_degrees(acos((matrix_trace(3, rotation_matrices[i]) - 1) / 2.));
     }
 }
 
+/**
+ * Compute the rotation vector
+ * @param u_a the array allocated for rotation vectors
+ * @param rotation_matrices the array of rotation matrices
+ * @param len the length of one strand
+ */
 void get_unit_rotation_vector(double u_a[][3], double rotation_matrices[][3][3], int len) {
     for (int i = 0; i < len; i++) {
         u_a[i][0] = rotation_matrices[i][1][2] - rotation_matrices[i][2][1];
@@ -68,12 +92,26 @@ void get_unit_rotation_vector(double u_a[][3], double rotation_matrices[][3][3],
     }
 }
 
+/**
+ * Compute the middle frames as averages between neighbouring base frames
+ * @param middle_frames the array allocated for middle frames matrices
+ * @param frames_1 the base frame matrices of strand 1
+ * @param frames_2 the base frame matrices of strand 2
+ * @param len the length of one strand
+ */
 void get_intra_middle_frames(double middle_frames[][3][3], double frames_1[][3][3], double frames_2[][3][3], int len) {
     for (int i = 0; i < len; i++) {
         average_two_matrices(3, 3, middle_frames[i], frames_1[i], frames_2[i]);
     }
 }
 
+/**
+ * Compute the origins of the middle frames between neighbouring base frames
+ * @param middle_frames_origins the array allocated for origin vectors
+ * @param origins_1 the array of origins in strand 1
+ * @param origins_2 the array of origins in strand 2
+ * @param len the length of one strand
+ */
 void get_intra_middle_frames_origins(double middle_frames_origins[][3], double origins_1[][3], double origins_2[][3],
                                      int len) {
     for (int i = 0; i < len; i++) {
@@ -81,32 +119,58 @@ void get_intra_middle_frames_origins(double middle_frames_origins[][3], double o
     }
 }
 
-void get_translational_coords(double *coord_1, double *coord_2, double *coord_3, double middle_frames[][3][3],
+/**
+ * Compute the translational coordinates between neighbouring base frames
+ * @param coord_1 the array allocated for shear values
+ * @param coord_2 the array allocated for stagger values
+ * @param coord_3 the array allocated for stretch values
+ * @param middle_frames the array of middle frames between two base frames
+ * @param origins_1 the array of origins in strand 1
+ * @param origins_2 the array of origins in strand 2
+ * @param len the length of one strand
+ */
+void get_translational_coords(double *shear, double *stagger, double *stretch, double middle_frames[][3][3],
                               double origins_1[][3], double origins_2[][3], int len) {
     for (int i = 0; i < len; i++) {
         double lambda[3];
         subtract_two_vectors(3, lambda, origins_2[i], origins_1[i]);
         double coords[3];
         vector_matrix_multiplication(3, 3, coords, lambda, middle_frames[i]);
-        coord_1[i] = coords[0];
-        coord_2[i] = coords[1];
-        coord_3[i] = coords[2];
+        shear[i] = coords[0];
+        stagger[i] = coords[1];
+        stretch[i] = coords[2];
     }
 }
 
-void get_rotational_coords(double *coord_1, double *coord_2, double *coord_3, double angle[], double vector[][3],
+/**
+ * Compute the rotational coordinated between neighbouring base frames
+ * @param coord_1 the array allocated for buckle values
+ * @param coord_2 the array allocated for propeller values
+ * @param coord_3 the array allocated for opening values
+ * @param angle the array of rotation angles
+ * @param vector the array of rotation vectors
+ * @param middle_frames the array of middle frames between two base frames
+ * @param len the length of one strand
+ */
+void get_rotational_coords(double *buckle, double *propeller, double *opening, double angle[], double vector[][3],
                            double middle_frames[][3][3], int len) {
     for (int i = 0; i < len; i++) {
         double rotation[3];
         multiply_vector_by_scalar(3, angle[i], vector[i], rotation);
         double coords[3];
         vector_matrix_multiplication(3, 3, coords, rotation, middle_frames[i]);
-        coord_1[i] = coords[0];
-        coord_2[i] = coords[1];
-        coord_3[i] = coords[2];
+        buckle[i] = coords[0];
+        propeller[i] = coords[1];
+        opening[i] = coords[2];
     }
 }
 
+/**
+ * Compute rotation matrices describing rotation between consecutive base pair frames
+ * @param rotation_matrices the array allocated for rotation matrices
+ * @param middle_frames the array of base pair frames
+ * @param len the length of base pair middle frames array
+ */
 void get_inter_rotation_matrices(double rotation_matrices[][3][3], double middle_frames[][3][3], int len) {
     for (int i = 0; i < len; i++) {
         double frame_2_transposed[3][3];
@@ -115,12 +179,27 @@ void get_inter_rotation_matrices(double rotation_matrices[][3][3], double middle
     }
 }
 
+/**
+ * Compute the base pair frames as averages of consecutive base pair frames
+ * @param inter_middle_frames the array allocated for middle frames matrices
+ * @param frames the array of base pair frames
+ * @param len the length of base pair middle frames array
+ */
 void get_inter_middle_frames(double inter_middle_frames[][3][3], double frames[][3][3], int len) {
     for (int i = 0; i < len; i++) {
         average_two_matrices(3, 3, inter_middle_frames[i], frames[i], frames[i + 1]);
     }
 }
 
+/**
+ * Compute the internal translational coordinates between consecutive base pair frames
+ * @param shift the array allocated for shift values
+ * @param slide the array allocated for slide values
+ * @param rise the array allocated for rise values
+ * @param middle_frames the array of base pair middle frames matrices
+ * @param origins the array of base pair middle frames origins vectors
+ * @param len the length of base pair middle frames array
+ */
 void get_inter_translational_coords(double *shift, double *slide, double *rise, double middle_frames[][3][3],
                                     double origins[][3], int len) {
     for (int i = 0; i < len; i++) {
@@ -134,6 +213,16 @@ void get_inter_translational_coords(double *shift, double *slide, double *rise, 
     }
 }
 
+/**
+ * Compute the internal rotational coordinates between consecutive base pair frames
+ * @param roll the array for roll values
+ * @param tilt the array for tilt values
+ * @param twist the array for twist values
+ * @param angle the array of rotation angles
+ * @param vector the array of rotation vectors
+ * @param middle_frames the base pair middle frames
+ * @param len the length of base pair middle frames array
+ */
 void get_inter_rotational_coords(double *roll, double *tilt, double *twist, const double *angle, double vector[][3],
                                  double middle_frames[][3][3], int len) {
     for (int i = 0; i < len; i++) {
@@ -147,6 +236,16 @@ void get_inter_rotational_coords(double *roll, double *tilt, double *twist, cons
     }
 }
 
+/**
+ * Free allocated memory
+ * @param ta the pointer to rotation angle between two base frames array
+ * @param ua the pointer to rotation vector between two base frames array
+ * @param imf the pointer to base middle frames matrices array
+ * @param imfo the pointer to base middle frames origins vectors array
+ * @param te the pointer to rotation angle theta between two base pair frames array
+ * @param ue the pointer to rotation vector between two base pair frames array
+ * @param emf the pointer to base pair middle frames matrices array
+ */
 void free_curves_arrays(double ta[], double ua[][3], double imf[][3][3], double imfo[][3], double te[], double ue[][3],
                         double emf[][3][3]) {
     free(ta);
@@ -158,6 +257,14 @@ void free_curves_arrays(double ta[], double ua[][3], double imf[][3][3], double 
     free(emf);
 }
 
+/**
+ * Compute rotation angle and vector describing rotation between two base frames
+ * @param frames_1 the array of base frames in strand 1
+ * @param frames_2 the array of base frames in strand 2
+ * @param theta_a the array allocated for rotation angles
+ * @param u_vec_a the array allocated for rotation vectors
+ * @param len the length of one strand
+ */
 void prepare_intra_rotation(double frames_1[][3][3], double frames_2[][3][3], double theta_a[], double u_vec_a[][3],
                             int len) {
     double (*intra_rotation_matrices)[3][3] = malloc(len * sizeof(*intra_rotation_matrices));
@@ -168,6 +275,16 @@ void prepare_intra_rotation(double frames_1[][3][3], double frames_2[][3][3], do
     free(intra_rotation_matrices);
 }
 
+/**
+ * Compute orthonormal base middle frames and their origins
+ * @param middle_frames the array allocated for base middle frames matrices
+ * @param middle_origins the array allocated for base middle frames origins vectors
+ * @param frames_1 the array of base frames in strand 1
+ * @param frames_2 the array of base frames in strand 2
+ * @param origins_1 the array of base frame origin vectors in strand 1
+ * @param origins_2 the array of base frame origin vectors in strand 2
+ * @param len the length of one strand
+ */
 void get_intra_middle_frames_and_origins(double middle_frames[][3][3], double middle_origins[][3],
                                          double frames_1[][3][3], double frames_2[][3][3], double origins_1[][3],
                                          double origins_2[][3], int len) {
@@ -176,6 +293,14 @@ void get_intra_middle_frames_and_origins(double middle_frames[][3][3], double mi
     gram_schmidt_columns(middle_frames, len);
 }
 
+/**
+ * Compute the rotation angle and vector describing the rotation between consecutive base pair frames
+ * @param intra_middle_frames the array of base middle frames
+ * @param inter_middle_frames  the array of base pair middle frames
+ * @param theta_e the array allocated for rotation angles
+ * @param u_vec_e the array allocated for rotation vectors
+ * @param inter_len the length of base pair middle frames array
+ */
 void prepare_inter_rotation(double intra_middle_frames[][3][3], double inter_middle_frames[][3][3], double theta_e[],
                             double u_vec_e[][3], int inter_len) {
     double (*inter_rotation_matrices)[3][3] = malloc(inter_len * sizeof(*inter_rotation_matrices));
@@ -187,6 +312,25 @@ void prepare_inter_rotation(double intra_middle_frames[][3][3], double inter_mid
     free(inter_rotation_matrices);
 }
 
+/**
+ * Compute both translational and rotational coordinates according to the Curves+ definition
+ * @param frames_1 the array of base frames in strand 1
+ * @param frames_2 the array of base frames in strand 2
+ * @param origins_1 the array of base origins in strand 1
+ * @param origins_2 the array of base origins in strand 2
+ * @param shear the array allocated for shear values
+ * @param stretch the array allocated for stretch values
+ * @param stagger the array allocated for stagger values
+ * @param buckle the array allocated for buckle values
+ * @param propeller the array allocated for propeller values
+ * @param opening the array allocated for opening values
+ * @param shift the array allocated for shift values
+ * @param slide the array allocated for slide values
+ * @param rise the array allocated for rise values
+ * @param roll the array allocated for roll values
+ * @param tilt the array allocated for tilt values
+ * @param twist the array allocated for twist values
+ */
 void get_curves_coordinates(double frames_1[][3][3], double frames_2[][3][3], double origins_1[][3],
                             double origins_2[][3], double shear[], double stretch[], double stagger[], double buckle[],
                             double propeller[], double opening[], double shift[], double slide[], double rise[],
@@ -221,5 +365,3 @@ void get_curves_coordinates(double frames_1[][3][3], double frames_2[][3][3], do
                        inter_middle_frames);
 }
 
-#ifdef CMAKE_FINAL_THESIS_C_CURVES_COORDINATES_H
-#endif //CMAKE_FINAL_THESIS_C_CURVES_COORDINATES_H
