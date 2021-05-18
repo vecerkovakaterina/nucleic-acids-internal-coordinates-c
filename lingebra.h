@@ -10,7 +10,7 @@
  * @param m1 the first matrix
  * @param m2 the second matrix
  */
-static void matrix_multiplication(int l, int m, int n, double res[l][n], double m1[l][m], double m2[l][n]){
+static void matrix_multiplication(int l, int m, int n, double res[l][n], double m1[l][m], double m2[l][n]) {
     for (int i = 0; i < l; i++) {
         for (int j = 0; j < n; j++) {
             res[i][j] = 0;
@@ -33,7 +33,7 @@ static void matrix_multiplication(int l, int m, int n, double res[l][n], double 
  * @param transposed th resulting transposed matrix
  * @param matrix the matrix to be transposed
  */
-static void transpose_matrix(int m, int n, double transposed[n][m], double matrix[m][n]){
+static void transpose_matrix(int m, int n, double transposed[n][m], double matrix[m][n]) {
     for (int i = 0; i < m; i++)
         for (int j = 0; j < n; j++) {
             transposed[j][i] = matrix[i][j];
@@ -49,9 +49,9 @@ static void transpose_matrix(int m, int n, double transposed[n][m], double matri
  * @param m1 minuend
  * @param m2 subtrahend
  */
-static void subtract_matrices_generic(int m, int n, double res[m][n], double m1[m][n], double m2[m][n]){
-    for(int i = 0; i < m; i++){
-        for(int j = 0; j < n; j++){
+static void subtract_matrices_generic(int m, int n, double res[m][n], double m1[m][n], double m2[m][n]) {
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
             res[i][j] = m1[i][j] - m2[i][j];
         }
     }
@@ -65,9 +65,9 @@ static void subtract_matrices_generic(int m, int n, double res[m][n], double m1[
  * @param scalar the scalar multiplier
  * @param matrix the matrix multiplicand
  */
-static void multiply_matrix_by_scalar(int m, int n, double res[m][n], double scalar, double matrix[m][n]){
-    for(int i = 0; i < m; i++){
-        for(int j = 0; j < n; j++){
+static void multiply_matrix_by_scalar(int m, int n, double res[m][n], double scalar, double matrix[m][n]) {
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
             res[i][j] = scalar * matrix[i][j];
         }
     }
@@ -80,10 +80,10 @@ static void multiply_matrix_by_scalar(int m, int n, double res[m][n], double sca
  * @param res resulting vector with sums
  * @param matrix the matrix whose columns are to be added
  */
-static void get_sum_of_columns_matrix(int m, int n, double res[n], double matrix[m][n]){
-    for(int i = 0; i < n; i++){
+static void get_sum_of_columns_matrix(int m, int n, double res[n], double matrix[m][n]) {
+    for (int i = 0; i < n; i++) {
         res[i] = 0.;
-        for(int j = 0; j < m; j++){
+        for (int j = 0; j < m; j++) {
             res[i] += matrix[j][i];
         }
     }
@@ -97,9 +97,9 @@ static void get_sum_of_columns_matrix(int m, int n, double res[n], double matrix
  * @param matrix the m, 1 matrix of ones
  * @param vec the vector to be repeated
  */
-static void spread_vector_into_m_rows(int m, int n, double res[m][n], double matrix[][1], const double vec[n]){
-    for(int i = 0; i < m; i++){
-        for(int j = 0; j < n; j++){
+static void spread_vector_into_m_rows(int m, int n, double res[m][n], double matrix[][1], const double vec[n]) {
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
             res[i][j] = matrix[i][0] * vec[j];
         }
     }
@@ -112,10 +112,10 @@ static void spread_vector_into_m_rows(int m, int n, double res[m][n], double mat
  * @param avg the resulting vector
  * @param matrix the matrix whose columns are to be averaged
  */
-static void average_matrix_columns(int m, int n, double avg[n], double matrix[m][n]){
-    for(int i = 0; i < n; i++){
+static void average_matrix_columns(int m, int n, double avg[n], double matrix[m][n]) {
+    for (int i = 0; i < n; i++) {
         avg[i] = 0.;
-        for(int j = 0; j < m; j++){
+        for (int j = 0; j < m; j++) {
             avg[i] += matrix[j][i];
         }
         avg[i] /= m;
@@ -130,7 +130,7 @@ static void average_matrix_columns(int m, int n, double avg[n], double matrix[m]
  * @param matrix the matrix multiplier
  * @param vec the vector multiplicand
  */
-static void matrix_vector_multiplication(int m, int n, double res[m], double matrix[m][n], const double vec[n]){
+static void matrix_vector_multiplication(int m, int n, double res[m], double matrix[m][n], const double vec[n]) {
     for (int i = 0; i < n; i++) {
         res[i] = 0;
     }
@@ -150,7 +150,7 @@ static void matrix_vector_multiplication(int m, int n, double res[m], double mat
  * @param vec the vector multiplier
  * * @param matrix the matrix multiplicand
  */
-static void vector_matrix_multiplication(int m, int n, double res[m], const double vec[n], double matrix[m][n]){
+static void vector_matrix_multiplication(int m, int n, double res[m], const double vec[n], double matrix[m][n]) {
     for (int i = 0; i < n; i++) {
         res[i] = 0;
     }
@@ -169,7 +169,7 @@ static void vector_matrix_multiplication(int m, int n, double res[m], const doub
  * @param v1 the minuend vector
  * @param v2 subtrahend vector
  */
-static void subtract_two_vectors(int n, double diff[n], const double v1[n], const double v2[n]){
+static void subtract_two_vectors(int n, double diff[n], const double v1[n], const double v2[n]) {
     for (int i = 0; i < n; i++) {
         diff[i] = v1[i] - v2[i];
     }
@@ -182,7 +182,7 @@ static void subtract_two_vectors(int n, double diff[n], const double v1[n], cons
  * @param vec2 the second vector
  * @return the dot product
  */
-static double dot_product(int n, const double vec1[], const double vec2[]){
+static double dot_product(int n, const double vec1[], const double vec2[]) {
     double dp = 0.;
     for (int i = 0; i < n; i++) {
         dp += vec1[i] * vec2[i];
@@ -196,7 +196,7 @@ static double dot_product(int n, const double vec1[], const double vec2[]){
  * @param vec1 the first vector
  * @param vec2 the second vector
  */
-static void cross_product(double cross_product[3], const double vec1[3], const double vec2[3]){
+static void cross_product(double cross_product[3], const double vec1[3], const double vec2[3]) {
     cross_product[0] = vec1[1] * vec2[2] - vec1[2] * vec2[1];
     cross_product[1] = vec1[2] * vec2[0] - vec1[0] * vec2[2];
     cross_product[2] = vec1[0] * vec2[1] - vec1[1] * vec2[0];
@@ -210,9 +210,9 @@ static void cross_product(double cross_product[3], const double vec1[3], const d
  * @param column index of the column to return the magnitude of
  * @return magnitude of selected column
  */
-static double matrix_column_magnitude(int m, int n, double matrix[m][n], int column){
+static double matrix_column_magnitude(int m, int n, double matrix[m][n], int column) {
     double mag = 0.;
-    for(int i = 0; i < m; i++){
+    for (int i = 0; i < m; i++) {
         mag += pow(matrix[i][column], 2);
     }
     return sqrt(mag);
@@ -224,9 +224,9 @@ static double matrix_column_magnitude(int m, int n, double matrix[m][n], int col
  * @param vec the vector whose magnitude is to be calculated
  * @return the magnitude of the vector
  */
-static double vector_magnitude(int n, double vec[]){
+static double vector_magnitude(int n, double vec[]) {
     double mag = 0.;
-    for(int i = 0; i < n; i++){
+    for (int i = 0; i < n; i++) {
         mag += pow(vec[i], 2);
     }
     return sqrt(mag);
@@ -237,7 +237,7 @@ static double vector_magnitude(int n, double vec[]){
  * @param n the length of the vector
  * @param vec the vector to be normalized
  */
-static void normalize_vector(int n, double vec[]){
+static void normalize_vector(int n, double vec[]) {
     double magnitude = vector_magnitude(n, vec);
     for (int i = 0; i < n; i++) {
         vec[i] = vec[i] / magnitude;
@@ -251,7 +251,7 @@ static void normalize_vector(int n, double vec[]){
  * @param vector the multiplicand
  * @param multiplied the resulting multiplied vector
  */
-static void multiply_vector_by_scalar(double n, double scalar, const double vector[], double multiplied[]){
+static void multiply_vector_by_scalar(double n, double scalar, const double vector[], double multiplied[]) {
     for (int i = 0; i < n; i++) {
         multiplied[i] = vector[i] * scalar;
     }
@@ -263,9 +263,9 @@ static void multiply_vector_by_scalar(double n, double scalar, const double vect
  * @param matrix the matrix whose trace is to be returned
  * @return the trace of the square matrix
  */
-static double matrix_trace(int m, double matrix[m][m]){
+static double matrix_trace(int m, double matrix[m][m]) {
     double trace = 0.;
-    for(int i = 0; i < m; i++){
+    for (int i = 0; i < m; i++) {
         trace += matrix[i][i];
     }
     return trace;
@@ -297,7 +297,7 @@ static double degrees_to_radians(double degrees) {
  * @param m1 the first matrix to be averaged
  * @param m2 the second matrix to be averaged
  */
-static void average_two_matrices(int m, int n, double avg[m][n], double m1[m][n], double m2[m][n]){
+static void average_two_matrices(int m, int n, double avg[m][n], double m1[m][n], double m2[m][n]) {
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
             avg[i][j] = (m1[i][j] + m2[i][j]) / 2;
@@ -312,7 +312,7 @@ static void average_two_matrices(int m, int n, double avg[m][n], double m1[m][n]
  * @param vec1 the first vector to be averaged
  * @param vec2 the second vector to be averaged
  */
-static void average_two_vectors(int n, double avg[n], const double vec1[n], const double vec2[n]){
+static void average_two_vectors(int n, double avg[n], const double vec1[n], const double vec2[n]) {
     for (int i = 0; i < n; i++) {
         avg[i] = (vec1[i] + vec2[i]) / 2;
     }
