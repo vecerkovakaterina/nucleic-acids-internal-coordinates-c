@@ -54,7 +54,7 @@ void gram_schmidt_columns(double frame[][3][3], int len) {
 
 void get_rotation_angle_theta(double *theta, double rotation_matrices[][3][3], int len) {
     for (int i = 0; i < len; i++) {
-        theta[i] = radians_to_degrees(acos((matrix_trace(3, rotation_matrices[i]) - 1) / 2));
+        theta[i] = radians_to_degrees(acos((matrix_trace(3, rotation_matrices[i]) - 1) / 2.));
     }
 }
 
@@ -121,12 +121,6 @@ void get_inter_middle_frames(double inter_middle_frames[][3][3], double frames[]
     }
 }
 
-void get_inter_middle_frames_origins(double inter_middle_frames_origins[][3], double origins[][3], int len) {
-    for (int i = 0; i < len; i++) {
-        average_two_vectors(3, inter_middle_frames_origins[i], origins[i], origins[i + 1]);
-    }
-}
-
 void get_inter_translational_coords(double *shift, double *slide, double *rise, double middle_frames[][3][3],
                                     double origins[][3], int len) {
     for (int i = 0; i < len; i++) {
@@ -153,21 +147,46 @@ void get_inter_rotational_coords(double *roll, double *tilt, double *twist, cons
     }
 }
 
-void free_curves_arrays(double irm[][3][3], double ta[], double ua[][3], double imf[][3][3], double imfo[][3],
-                        double erm[][3][3], double te[], double ue[][3], double emf[][3][3], double emfo[][3]) {
-    free(irm);
+void free_curves_arrays(double ta[], double ua[][3], double imf[][3][3], double imfo[][3], double te[], double ue[][3],
+                        double emf[][3][3]) {
     free(ta);
     free(ua);
     free(imf);
     free(imfo);
-    free(erm);
     free(te);
     free(ue);
     free(emf);
-    free(emfo);
 }
 
-//todo separate into functinos
+void prepare_intra_rotation(double frames_1[][3][3], double frames_2[][3][3], double theta_a[], double u_vec_a[][3],
+                            int len) {
+    double (*intra_rotation_matrices)[3][3] = malloc(len * sizeof(*intra_rotation_matrices));
+    curves_get_rotation_matrices(intra_rotation_matrices, frames_1, frames_2, len);
+    get_rotation_angle_theta(theta_a, intra_rotation_matrices, len);
+    get_unit_rotation_vector(u_vec_a, intra_rotation_matrices, len);
+
+    free(intra_rotation_matrices);
+}
+
+void get_intra_middle_frames_and_origins(double middle_frames[][3][3], double middle_origins[][3],
+                                         double frames_1[][3][3], double frames_2[][3][3], double origins_1[][3],
+                                         double origins_2[][3], int len) {
+    get_intra_middle_frames(middle_frames, frames_1, frames_2, len);
+    get_intra_middle_frames_origins(middle_origins, origins_1, origins_2, len);
+    gram_schmidt_columns(middle_frames, len);
+}
+
+void prepare_inter_rotation(double intra_middle_frames[][3][3], double inter_middle_frames[][3][3], double theta_e[],
+                            double u_vec_e[][3], int inter_len) {
+    double (*inter_rotation_matrices)[3][3] = malloc(inter_len * sizeof(*inter_rotation_matrices));
+    get_inter_rotation_matrices(inter_rotation_matrices, intra_middle_frames, inter_len);
+    get_rotation_angle_theta(theta_e, inter_rotation_matrices, inter_len);
+    get_unit_rotation_vector(u_vec_e, inter_rotation_matrices, inter_len);
+    get_inter_middle_frames(inter_middle_frames, intra_middle_frames, inter_len);
+
+    free(inter_rotation_matrices);
+}
+
 void get_curves_coordinates(double frames_1[][3][3], double frames_2[][3][3], double origins_1[][3],
                             double origins_2[][3], double shear[], double stretch[], double stagger[], double buckle[],
                             double propeller[], double opening[], double shift[], double slide[], double rise[],
@@ -176,44 +195,30 @@ void get_curves_coordinates(double frames_1[][3][3], double frames_2[][3][3], do
     int strand_len = (int) (snapshot_len / 2);
     int inter_len = strand_len - 1;
 
-    double (*intra_rotation_matrices)[3][3] = malloc(strand_len * sizeof(*intra_rotation_matrices));
-    curves_get_rotation_matrices(intra_rotation_matrices, frames_1, frames_2, strand_len);
-
     double *theta_a = malloc(strand_len * sizeof(*theta_a));
-    get_rotation_angle_theta(theta_a, intra_rotation_matrices, strand_len);
-
     double (*unit_rotation_vector_a)[3] = malloc(strand_len * sizeof(*unit_rotation_vector_a));
-    get_unit_rotation_vector(unit_rotation_vector_a, intra_rotation_matrices, strand_len);
+    prepare_intra_rotation(frames_1, frames_2, theta_a, unit_rotation_vector_a, strand_len);
 
     double (*intra_middle_frames)[3][3] = malloc(strand_len * sizeof(*intra_middle_frames));
-    get_intra_middle_frames(intra_middle_frames, frames_1, frames_2, strand_len);
     double (*intra_middle_frames_origins)[3] = malloc(strand_len * sizeof(*intra_middle_frames_origins));
-    get_intra_middle_frames_origins(intra_middle_frames_origins, origins_1, origins_2, strand_len);
-
-    //orthonormalize intra-bp middle frames
-    gram_schmidt_columns(intra_middle_frames, strand_len);
+    get_intra_middle_frames_and_origins(intra_middle_frames, intra_middle_frames_origins, frames_1, frames_2,
+                                        origins_1, origins_2, strand_len);
 
     get_translational_coords(shear, stagger, stretch, intra_middle_frames, origins_1, origins_2, strand_len);
     get_rotational_coords(buckle, propeller, opening, theta_a, unit_rotation_vector_a, intra_middle_frames, strand_len);
 
     //inter-bp
-    double (*inter_rotation_matrices)[3][3] = malloc(inter_len * sizeof(*inter_rotation_matrices));
-    get_inter_rotation_matrices(inter_rotation_matrices, intra_middle_frames, inter_len);
     double (*theta_e) = malloc(inter_len * sizeof(*theta_e));
-    get_rotation_angle_theta(theta_e, inter_rotation_matrices, inter_len);
     double (*unit_rotation_vector_e)[3] = malloc(strand_len * sizeof(*unit_rotation_vector_e));
-    get_unit_rotation_vector(unit_rotation_vector_e, inter_rotation_matrices, inter_len);
     double (*inter_middle_frames)[3][3] = malloc(inter_len * sizeof(*inter_middle_frames));
-    get_inter_middle_frames(inter_middle_frames, intra_middle_frames, inter_len);
-    double (*inter_middle_frames_origins)[3] = malloc(inter_len * sizeof(*inter_middle_frames_origins));
-    get_inter_middle_frames_origins(inter_middle_frames_origins, intra_middle_frames_origins, inter_len);
+    prepare_inter_rotation(intra_middle_frames, inter_middle_frames, theta_e, unit_rotation_vector_e, inter_len);
 
     get_inter_translational_coords(shift, slide, rise, inter_middle_frames, intra_middle_frames_origins, inter_len);
     get_inter_rotational_coords(roll, tilt, twist, theta_e, unit_rotation_vector_e, inter_middle_frames, inter_len);
 
-    free_curves_arrays(intra_rotation_matrices, theta_a, unit_rotation_vector_a, intra_middle_frames,
-                       intra_middle_frames_origins, inter_rotation_matrices, theta_e, unit_rotation_vector_e,
-                       inter_middle_frames, inter_middle_frames_origins);
+    free_curves_arrays(theta_a, unit_rotation_vector_a, intra_middle_frames,
+                       intra_middle_frames_origins, theta_e, unit_rotation_vector_e,
+                       inter_middle_frames);
 }
 
 #ifdef CMAKE_FINAL_THESIS_C_CURVES_COORDINATES_H
