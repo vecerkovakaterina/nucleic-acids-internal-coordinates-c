@@ -203,22 +203,6 @@ static void cross_product(double cross_product[3], const double vec1[3], const d
 }
 
 /**
- * Return the magnitude of matrix column
- * @param m number of rows of the matrix
- * @param n number of columns of the matrix
- * @param matrix the matrix whose columns magnitudes are to be found
- * @param column index of the column to return the magnitude of
- * @return magnitude of selected column
- */
-static double matrix_column_magnitude(int m, int n, double matrix[m][n], int column) {
-    double mag = 0.;
-    for (int i = 0; i < m; i++) {
-        mag += pow(matrix[i][column], 2);
-    }
-    return sqrt(mag);
-}
-
-/**
  * Return magnitude of vector
  * @param n the length of the vector
  * @param vec the vector whose magnitude is to be calculated

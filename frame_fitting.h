@@ -304,13 +304,6 @@ void matrix_from_pyrimidine_residuum(double matrix[6][3], pyrimidine residuum) {
     }
 }
 
-void subtract_matrices(int m, int n, double res[m][n], double m1[m][n], double m2[m][n]) {
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            res[i][j] = m1[i][j] - m2[i][j];
-        }
-    }
-}
 
 void create_covariance_matrix_purine(double cm[3][3], purine experimental, purine standard) {
     double ones[9][1] = {{1},
@@ -346,7 +339,7 @@ void create_covariance_matrix_purine(double cm[3][3], purine experimental, purin
                        {0, 0, 0}};
     matrix_multiplication(3, 9, 3, m2, standard_matrix_t, experimental_matrix);
     double m[3][3];
-    subtract_matrices(3, 3, m, m2, m1);
+    subtract_matrices_generic(3, 3, m, m2, m1);
     multiply_matrix_by_scalar(3, 3, cm, (1. / (no_atoms - 1)), m);
 
     //(1/no_atoms-1)(m2 - (1/no_atoms)*m1)
@@ -383,7 +376,7 @@ void create_covariance_matrix_pyrimidine(double cm[3][3], pyrimidine experimenta
                        {0, 0, 0}};
     matrix_multiplication(3, 6, 3, m2, standard_matrix_t, experimental_matrix);
     double m[3][3];
-    subtract_matrices(3, 3, m, m2, m1);
+    subtract_matrices_generic(3, 3, m, m2, m1);
     multiply_matrix_by_scalar(3, 3, cm, (1. / (no_atoms - 1)), m);
 
 
