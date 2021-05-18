@@ -113,7 +113,6 @@ void get_shear_stretch_stagger(double shear[],
     double difference_origins[3];
     double shear_stretch_stagger[3];
     for (int i = 0; i < strand_len; i++) {
-        //todo check 1- 2 or 2 - 1
         subtract_two_vectors(3, difference_origins, origins_II[i], origins_I[i]);
         matrix_vector_multiplication(3, 3, shear_stretch_stagger, middle_frames[i], difference_origins);
         shear[i] = shear_stretch_stagger[0];
@@ -289,14 +288,65 @@ void get_twist_array(double *twist,
     }
 }
 
-void free_3dna_arrays(double hai[][3], double bp[], double rm[][3][3], double rm1[][3][3], double rm2[][3][3],
-                      double mfi[][3][3], double mfio[][3], double pai[],
-                      double hae[][3], double rt[], double mbp[][3][3], double mbpo[][3], double pae[]){
-    free(hai); free(bp); free(rm); free(rm1); free(rm2); free(mfi); free(mfio); free(pai);
-    free(hae); free(rt); free(mbp); free(mbpo); free(pae);
+void free_3dna_arrays(double mfi[][3][3], double mfio[][3]){
+    free(mfi); free(mfio);
 }
 
-//todo separate into functions
+void free_intra_arrays(double ha[][3], double bp[], double rm[][3][3], double rm1[][3][3], double rm2[][3][3], double pa[]){
+    free(ha); free(bp); free(rm); free(rm1); free(rm2); free(pa);
+}
+
+void get_intra_coordinates(double frames_1[][3][3], double frames_2[][3][3], double origins_1[][3],
+                           double origins_2[][3], double middle_frames[][3][3], double middle_frames_origins[][3],
+                           double shear[], double stretch[], double stagger[], double buckle[], double propeller[],
+                           double opening[], int strand_len) {
+    double (*hinge_axes_array_intra)[3] = malloc(strand_len * sizeof(*hinge_axes_array_intra));
+    double *bucklepropeller_array = malloc(strand_len * sizeof(*bucklepropeller_array));
+    double (*rotation_matrices_array)[3][3] = malloc(strand_len * sizeof(*rotation_matrices_array));
+    double (*rotated_matrices_strand_I)[3][3] = malloc(strand_len * sizeof(*rotated_matrices_strand_I));
+    double (*rotated_matrices_strand_II)[3][3] = malloc(strand_len * sizeof(*rotated_matrices_strand_II));
+    double *phase_angle_array_base_frames = malloc(strand_len * sizeof(*phase_angle_array_base_frames));
+
+    get_hinge_axes_intra_array(hinge_axes_array_intra, strand_len, frames_1, frames_2);
+    create_bucklepropeller_array(strand_len, frames_1, frames_2, bucklepropeller_array);
+    rotate_frames(rotated_matrices_strand_I, frames_1, hinge_axes_array_intra, rotation_matrices_array, bucklepropeller_array, 0.5, strand_len);
+    rotate_frames(rotated_matrices_strand_II, frames_2, hinge_axes_array_intra, rotation_matrices_array, bucklepropeller_array, -0.5, strand_len);
+    get_middle_frames_array(middle_frames, rotated_matrices_strand_I, rotated_matrices_strand_II, strand_len);
+    get_middle_frames_origins_array(middle_frames_origins, origins_1, origins_2, strand_len);
+    get_shear_stretch_stagger(shear, stretch, stagger, origins_1, origins_2, middle_frames, strand_len);
+    get_opening_angle_array(opening, rotated_matrices_strand_I, rotated_matrices_strand_II, strand_len, middle_frames);
+    get_phase_angle_array(phase_angle_array_base_frames, hinge_axes_array_intra, middle_frames, strand_len);
+    get_bp_or_rt_angle_array(buckle, propeller, bucklepropeller_array, phase_angle_array_base_frames, strand_len);
+
+    free_intra_arrays(hinge_axes_array_intra, bucklepropeller_array, rotation_matrices_array, rotated_matrices_strand_I,
+                      rotated_matrices_strand_II, phase_angle_array_base_frames);
+}
+
+void free_inter_arrays(double ha[][3], double rt[], double mf[][3][3], double mfo[][3], double pa[]){
+    free(ha); free(rt); free(mf); free(mfo); free(pa);
+}
+
+void get_inter_coordinates(double frames[][3][3], double frames_origins[][3], double shift[], double slide[],
+                           double rise[], double roll[], double tilt[], double twist[], int inter_len) {
+    double (*hinge_axes_array_inter)[3] = malloc(inter_len * sizeof(*hinge_axes_array_inter));
+    double *rolltilt_array = malloc(inter_len * sizeof(*rolltilt_array));
+    double (*middle_base_pair_frames_array)[3][3] = malloc(inter_len * sizeof(*middle_base_pair_frames_array));
+    double (*middle_base_pair_frames_origins_array)[3] = malloc(inter_len * sizeof(*middle_base_pair_frames_origins_array));
+    double *phase_angle_array_base_pair_frames = malloc(inter_len * sizeof(*phase_angle_array_base_pair_frames));
+
+    get_hinge_axes_inter_array(hinge_axes_array_inter, frames, inter_len);
+    get_rolltilt_angle_array(rolltilt_array, frames, inter_len);
+    get_middle_base_pair_frames_array(middle_base_pair_frames_array, frames, hinge_axes_array_inter, rolltilt_array, inter_len);
+    get_middle_base_pair_frames_origins_array(middle_base_pair_frames_origins_array, frames_origins, inter_len);
+    get_shift_slide_rise(shift, slide, rise, frames_origins, middle_base_pair_frames_array, inter_len);
+    get_twist_array(twist, rolltilt_array, hinge_axes_array_inter, frames, middle_base_pair_frames_array, inter_len);
+    get_phase_angle_array(phase_angle_array_base_pair_frames, hinge_axes_array_inter, middle_base_pair_frames_array, inter_len);
+    get_bp_or_rt_angle_array(roll, tilt, rolltilt_array, phase_angle_array_base_pair_frames, inter_len);
+
+    free_inter_arrays(hinge_axes_array_inter, rolltilt_array, middle_base_pair_frames_array,
+                      middle_base_pair_frames_origins_array, phase_angle_array_base_pair_frames);
+}
+
 void get_3dna_coordinates(double frames_1[][3][3], double frames_2[][3][3], double origins_1[][3],
                           double origins_2[][3], double shear[], double stretch[], double stagger[], double buckle[],
                           double propeller[], double opening[], double shift[], double slide[], double rise[],
@@ -306,92 +356,19 @@ void get_3dna_coordinates(double frames_1[][3][3], double frames_2[][3][3], doub
     int strand_len = snapshot_len / 2;
     int inter_len = strand_len - 1;
 
-    //hinge axis
-    double (*hinge_axes_array_intra)[3];
-    hinge_axes_array_intra = malloc(strand_len * sizeof(*hinge_axes_array_intra));
-    get_hinge_axes_intra_array(hinge_axes_array_intra, strand_len, frames_1, frames_2);
-
-    //bucklepropeller_array angle array
-    double *bucklepropeller_array = malloc(strand_len * sizeof(*bucklepropeller_array));
-    create_bucklepropeller_array(strand_len, frames_1, frames_2, bucklepropeller_array);
-
-    //rotated matrix array
-    double (*rotation_matrices_array)[3][3] = malloc(strand_len * sizeof(*rotation_matrices_array));
-    double (*rotated_matrices_strand_I)[3][3] = malloc(strand_len * sizeof(*rotated_matrices_strand_I));
-    double (*rotated_matrices_strand_II)[3][3] = malloc(strand_len * sizeof(*rotated_matrices_strand_II));
-
-    rotate_frames(rotated_matrices_strand_I, frames_1, hinge_axes_array_intra, rotation_matrices_array,
-                  bucklepropeller_array, 0.5, strand_len);
-    rotate_frames(rotated_matrices_strand_II, frames_2, hinge_axes_array_intra, rotation_matrices_array,
-                  bucklepropeller_array, -0.5, strand_len);
-
-    //middle frames array
+    //base frame coordinates
     double (*middle_base_frames_array)[3][3] = malloc(strand_len * sizeof(*middle_base_frames_array));
-    get_middle_frames_array(middle_base_frames_array, rotated_matrices_strand_I, rotated_matrices_strand_II,
-                            strand_len);
     double (*middle_base_frames_origins_array)[3] = malloc(strand_len * sizeof(*middle_base_frames_origins_array));
-    get_middle_frames_origins_array(middle_base_frames_origins_array, origins_1,
-                                    origins_2, strand_len);
 
-    //translational coordinates shear, stretch, stagger
-    get_shear_stretch_stagger(shear, stretch, stagger, origins_1, origins_2,
-                              middle_base_frames_array, strand_len);
-
-    //opening angle array
-    get_opening_angle_array(opening, rotated_matrices_strand_I, rotated_matrices_strand_II, strand_len,
-                            middle_base_frames_array);
-
-    //phase angle array
-    double *phase_angle_array_base_frames = malloc(strand_len * sizeof(*phase_angle_array_base_frames));
-    get_phase_angle_array(phase_angle_array_base_frames, hinge_axes_array_intra, middle_base_frames_array,
-                          strand_len);
-
-    get_bp_or_rt_angle_array(buckle, propeller, bucklepropeller_array, phase_angle_array_base_frames, strand_len);
+    get_intra_coordinates(frames_1, frames_2, origins_1, origins_2, middle_base_frames_array,
+                          middle_base_frames_origins_array, shear, stretch, stagger, buckle, propeller, opening, strand_len);
 
     //base pair frames coordinates
     double (*base_pair_frames)[3][3] = middle_base_frames_array;
     double (*base_pair_frames_origins)[3] = middle_base_frames_origins_array;
+    get_inter_coordinates(base_pair_frames, base_pair_frames_origins, shift, slide, rise, roll, tilt, twist, inter_len);
 
-    //hinge axes array
-    double (*hinge_axes_array_inter)[3] = malloc(inter_len * sizeof(*hinge_axes_array_inter));
-    get_hinge_axes_inter_array(hinge_axes_array_inter, base_pair_frames, inter_len);
-
-    //rolltilt angle array
-    double *rolltilt_array = malloc(inter_len * sizeof(*rolltilt_array));
-    get_rolltilt_angle_array(rolltilt_array, base_pair_frames, inter_len);
-
-    //middle base-pair frames array
-    double (*middle_base_pair_frames_array)[3][3] = malloc(strand_len * sizeof(*middle_base_pair_frames_array));
-    get_middle_base_pair_frames_array(middle_base_pair_frames_array, base_pair_frames, hinge_axes_array_inter,
-                                      rolltilt_array, inter_len);
-
-    //middle base-pair frames origins array
-    double (*middle_base_pair_frames_origins_array)[3] = malloc(
-            strand_len * sizeof(*middle_base_pair_frames_origins_array));
-    get_middle_base_pair_frames_origins_array(middle_base_pair_frames_origins_array, base_pair_frames_origins,
-                                              inter_len);
-
-    //translational base-pair frames coordinates
-    get_shift_slide_rise(shift, slide, rise, base_pair_frames_origins, middle_base_pair_frames_array, inter_len);
-
-    //rotational base-pair frames coordinates
-    //twist angle array
-    get_twist_array(twist, rolltilt_array, hinge_axes_array_inter, base_pair_frames, middle_base_pair_frames_array,
-                    inter_len);
-
-    //phase angle array
-    double *phase_angle_array_base_pair_frames = malloc(inter_len * sizeof(*phase_angle_array_base_pair_frames));
-
-    get_phase_angle_array(phase_angle_array_base_pair_frames, hinge_axes_array_inter, middle_base_pair_frames_array,
-                          inter_len);
-
-    //roll tilt angle array
-    get_bp_or_rt_angle_array(tilt, roll, rolltilt_array, phase_angle_array_base_pair_frames, inter_len);
-    free_3dna_arrays(hinge_axes_array_intra, bucklepropeller_array, rotation_matrices_array, rotated_matrices_strand_I,
-                     rotated_matrices_strand_II, middle_base_frames_array, middle_base_frames_origins_array,
-                     phase_angle_array_base_frames, hinge_axes_array_inter,
-                     rolltilt_array, middle_base_pair_frames_array, middle_base_pair_frames_origins_array,
-                     phase_angle_array_base_pair_frames);
+    free_3dna_arrays(middle_base_frames_array, middle_base_frames_origins_array);
 }
 
 #ifndef CMAKE_FINAL_THESIS_C_3DNA_COORDINATES_H
