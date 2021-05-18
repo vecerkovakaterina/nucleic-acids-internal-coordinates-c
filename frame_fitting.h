@@ -3,7 +3,7 @@
 #include <string.h>
 #include "lh3.h"
 #include "lingebra.h"
-//todo change strand 1 and strand 2
+
 //todo sort snapshot array length
 #define SNAPSHOT_ARRAY_LENGTH 100
 int snapshot_len = 0;
@@ -312,7 +312,6 @@ void subtract_matrices(int m, int n, double res[m][n], double m1[m][n], double m
     }
 }
 
-// todo separate into functions
 void create_covariance_matrix_purine(double cm[3][3], purine experimental, purine standard) {
     double ones[9][1] = {{1},
                          {1},
@@ -353,7 +352,6 @@ void create_covariance_matrix_purine(double cm[3][3], purine experimental, purin
     //(1/no_atoms-1)(m2 - (1/no_atoms)*m1)
 }
 
-// todo separate into functions
 void create_covariance_matrix_pyrimidine(double cm[3][3], pyrimidine experimental, pyrimidine standard) {
     double ones[6][1] = {{1},
                          {1},
@@ -491,7 +489,6 @@ void get_rotation_matrices(double rm[][3][3], double sm[][4][4], int len) {
     }
 }
 
-//todo separate into functions
 void get_rotation_matrices_origins(double origins[][3], residuum snapshot[], double rotation_matrices[][3][3],
                                    int len, purine std_A, purine std_G, pyrimidine std_C, pyrimidine std_T,
                                    pyrimidine std_U) {
