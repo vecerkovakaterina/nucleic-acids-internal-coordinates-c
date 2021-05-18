@@ -385,8 +385,3 @@ void get_3dna_coordinates(double frames_1[][3][3], double frames_2[][3][3], doub
 
     free_3dna_arrays(middle_base_frames_array, middle_base_frames_origins_array);
 }
-
-#ifndef CMAKE_FINAL_THESIS_C_3DNA_COORDINATES_H
-#define CMAKE_FINAL_THESIS_C_3DNA_COORDINATES_H
-
-#endif //CMAKE_FINAL_THESIS_C_3DNA_COORDINATES_H
