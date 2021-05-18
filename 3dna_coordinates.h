@@ -3,8 +3,6 @@
 #include <string.h>
 #include <math.h>
 
-#define SNAPSHOT_ARRAY_LENGTH 100
-
 void select_frames_axis(double *axis_array,
                         double frame[][3][3],
                         char axis,
@@ -51,7 +49,7 @@ void create_bucklepropeller_array(int len,
         select_frames_axis(z1, strand_1, 'z', i);
         select_frames_axis(z2, strand_2, 'z', i);
 
-        double angle = dot_product(3, z1, z2) / (vector_magnitude(3, z1) * vector_magnitude(3, z2));
+        double angle = dot_product(3, z1, z2) / (double) (vector_magnitude(3, z1) * vector_magnitude(3, z2));
         angle = radians_to_degrees(acos(angle));
         bp_array[i] = angle;
     }
@@ -149,7 +147,7 @@ void get_opening_angle_array(double opening_array[],
         select_frames_axis(axis_rotated_1, rotated_frames_I, 'y', i);
         select_frames_axis(axis_rotated_2, rotated_frames_II, 'y', i);
         opening_array[i] = dot_product(3, axis_rotated_1, axis_rotated_2) /
-                           (vector_magnitude(3, axis_rotated_1) * vector_magnitude(3, axis_rotated_2));
+                           (double) (vector_magnitude(3, axis_rotated_1) * vector_magnitude(3, axis_rotated_2));
         opening_array[i] = radians_to_degrees(acos(opening_array[i]));
         opening_array[i] = opening_array[i] * get_angle_sign(axis_rotated_1, axis_rotated_2, middle_frames_array, i);
     }
@@ -163,7 +161,7 @@ void get_phase_angle_array(double *phase,
     for (int i = 0; i < strand_len; i++) {
         select_frames_axis(middle_frame_y, middle_frames, 'y', i);
         phase[i] = dot_product(3, hinge_axes[i], middle_frame_y) /
-                   (vector_magnitude(3, hinge_axes[i]) * vector_magnitude(3, middle_frame_y));
+                   (double) (vector_magnitude(3, hinge_axes[i]) * vector_magnitude(3, middle_frame_y));
         phase[i] = radians_to_degrees(acos(phase[i]));
         phase[i] = phase[i] * get_angle_sign(hinge_axes[i], middle_frame_y, middle_frames, i);
     }
@@ -204,7 +202,7 @@ void get_rolltilt_angle_array(double *rolltilt,
         select_frames_axis(base_pair_z_2, base_pair_frames, 'z', i + 1);
 
         rolltilt[i] = dot_product(3, base_pair_z_1, base_pair_z_2) /
-                      (vector_magnitude(3, base_pair_z_1) * vector_magnitude(3, base_pair_z_2));
+                      (double) (vector_magnitude(3, base_pair_z_1) * vector_magnitude(3, base_pair_z_2));
         rolltilt[i] = radians_to_degrees(acos(rolltilt[i]));
     }
 }
@@ -280,20 +278,27 @@ void get_twist_array(double *twist,
         select_frame_axis(rotated_matrix_y_axis_1, rotated_matrix_1, 'y');
         select_frame_axis(rotated_matrix_y_axis_2, rotated_matrix_2, 'y');
 
-        twist[i] = dot_product(3, rotated_matrix_y_axis_1, rotated_matrix_y_axis_2)
-                   / (vector_magnitude(3, rotated_matrix_y_axis_1) * vector_magnitude(3, rotated_matrix_y_axis_2));
+        twist[i] = dot_product(3, rotated_matrix_y_axis_1, rotated_matrix_y_axis_2) / (double)
+                (vector_magnitude(3, rotated_matrix_y_axis_1) * vector_magnitude(3, rotated_matrix_y_axis_2));
 
         twist[i] = radians_to_degrees(acos(twist[i]));
         twist[i] *= get_angle_sign(rotated_matrix_y_axis_1, rotated_matrix_y_axis_2, middle_frames, i);
     }
 }
 
-void free_3dna_arrays(double mfi[][3][3], double mfio[][3]){
-    free(mfi); free(mfio);
+void free_3dna_arrays(double mfi[][3][3], double mfio[][3]) {
+    free(mfi);
+    free(mfio);
 }
 
-void free_intra_arrays(double ha[][3], double bp[], double rm[][3][3], double rm1[][3][3], double rm2[][3][3], double pa[]){
-    free(ha); free(bp); free(rm); free(rm1); free(rm2); free(pa);
+void
+free_intra_arrays(double ha[][3], double bp[], double rm[][3][3], double rm1[][3][3], double rm2[][3][3], double pa[]) {
+    free(ha);
+    free(bp);
+    free(rm);
+    free(rm1);
+    free(rm2);
+    free(pa);
 }
 
 void get_intra_coordinates(double frames_1[][3][3], double frames_2[][3][3], double origins_1[][3],
@@ -309,8 +314,10 @@ void get_intra_coordinates(double frames_1[][3][3], double frames_2[][3][3], dou
 
     get_hinge_axes_intra_array(hinge_axes_array_intra, strand_len, frames_1, frames_2);
     create_bucklepropeller_array(strand_len, frames_1, frames_2, bucklepropeller_array);
-    rotate_frames(rotated_matrices_strand_I, frames_1, hinge_axes_array_intra, rotation_matrices_array, bucklepropeller_array, 0.5, strand_len);
-    rotate_frames(rotated_matrices_strand_II, frames_2, hinge_axes_array_intra, rotation_matrices_array, bucklepropeller_array, -0.5, strand_len);
+    rotate_frames(rotated_matrices_strand_I, frames_1, hinge_axes_array_intra, rotation_matrices_array,
+                  bucklepropeller_array, 0.5, strand_len);
+    rotate_frames(rotated_matrices_strand_II, frames_2, hinge_axes_array_intra, rotation_matrices_array,
+                  bucklepropeller_array, -0.5, strand_len);
     get_middle_frames_array(middle_frames, rotated_matrices_strand_I, rotated_matrices_strand_II, strand_len);
     get_middle_frames_origins_array(middle_frames_origins, origins_1, origins_2, strand_len);
     get_shear_stretch_stagger(shear, stretch, stagger, origins_1, origins_2, middle_frames, strand_len);
@@ -322,8 +329,12 @@ void get_intra_coordinates(double frames_1[][3][3], double frames_2[][3][3], dou
                       rotated_matrices_strand_II, phase_angle_array_base_frames);
 }
 
-void free_inter_arrays(double ha[][3], double rt[], double mf[][3][3], double mfo[][3], double pa[]){
-    free(ha); free(rt); free(mf); free(mfo); free(pa);
+void free_inter_arrays(double ha[][3], double rt[], double mf[][3][3], double mfo[][3], double pa[]) {
+    free(ha);
+    free(rt);
+    free(mf);
+    free(mfo);
+    free(pa);
 }
 
 void get_inter_coordinates(double frames[][3][3], double frames_origins[][3], double shift[], double slide[],
@@ -331,16 +342,19 @@ void get_inter_coordinates(double frames[][3][3], double frames_origins[][3], do
     double (*hinge_axes_array_inter)[3] = malloc(inter_len * sizeof(*hinge_axes_array_inter));
     double *rolltilt_array = malloc(inter_len * sizeof(*rolltilt_array));
     double (*middle_base_pair_frames_array)[3][3] = malloc(inter_len * sizeof(*middle_base_pair_frames_array));
-    double (*middle_base_pair_frames_origins_array)[3] = malloc(inter_len * sizeof(*middle_base_pair_frames_origins_array));
+    double (*middle_base_pair_frames_origins_array)[3] = malloc(
+            inter_len * sizeof(*middle_base_pair_frames_origins_array));
     double *phase_angle_array_base_pair_frames = malloc(inter_len * sizeof(*phase_angle_array_base_pair_frames));
 
     get_hinge_axes_inter_array(hinge_axes_array_inter, frames, inter_len);
     get_rolltilt_angle_array(rolltilt_array, frames, inter_len);
-    get_middle_base_pair_frames_array(middle_base_pair_frames_array, frames, hinge_axes_array_inter, rolltilt_array, inter_len);
+    get_middle_base_pair_frames_array(middle_base_pair_frames_array, frames, hinge_axes_array_inter, rolltilt_array,
+                                      inter_len);
     get_middle_base_pair_frames_origins_array(middle_base_pair_frames_origins_array, frames_origins, inter_len);
     get_shift_slide_rise(shift, slide, rise, frames_origins, middle_base_pair_frames_array, inter_len);
     get_twist_array(twist, rolltilt_array, hinge_axes_array_inter, frames, middle_base_pair_frames_array, inter_len);
-    get_phase_angle_array(phase_angle_array_base_pair_frames, hinge_axes_array_inter, middle_base_pair_frames_array, inter_len);
+    get_phase_angle_array(phase_angle_array_base_pair_frames, hinge_axes_array_inter, middle_base_pair_frames_array,
+                          inter_len);
     get_bp_or_rt_angle_array(roll, tilt, rolltilt_array, phase_angle_array_base_pair_frames, inter_len);
 
     free_inter_arrays(hinge_axes_array_inter, rolltilt_array, middle_base_pair_frames_array,
@@ -361,7 +375,8 @@ void get_3dna_coordinates(double frames_1[][3][3], double frames_2[][3][3], doub
     double (*middle_base_frames_origins_array)[3] = malloc(strand_len * sizeof(*middle_base_frames_origins_array));
 
     get_intra_coordinates(frames_1, frames_2, origins_1, origins_2, middle_base_frames_array,
-                          middle_base_frames_origins_array, shear, stretch, stagger, buckle, propeller, opening, strand_len);
+                          middle_base_frames_origins_array, shear, stagger, stretch, buckle, propeller, opening,
+                          strand_len);
 
     //base pair frames coordinates
     double (*base_pair_frames)[3][3] = middle_base_frames_array;
