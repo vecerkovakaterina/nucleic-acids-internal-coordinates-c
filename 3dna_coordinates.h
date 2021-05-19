@@ -3,6 +3,13 @@
 #include <string.h>
 #include <math.h>
 
+/**
+ * Select columns from all base frame matrices
+ * @param axis_array the array allocated for the vectors
+ * @param frame the base frame matrix
+ * @param axis the axis char (x, y, z)
+ * @param index the index of the base frame in the array
+ */
 void select_frames_axis(double *axis_array,
                         double frame[][3][3],
                         char axis,
@@ -14,6 +21,12 @@ void select_frames_axis(double *axis_array,
     }
 }
 
+/**
+ * Select column from base frame matrix
+ * @param axis_array the array allocated for the vector
+ * @param frame the base frame
+ * @param axis the axis char (x, y, z)
+ */
 void select_frame_axis(double *axis_array,
                        double frame[3][3],
                        char axis) {
@@ -24,6 +37,13 @@ void select_frame_axis(double *axis_array,
     }
 }
 
+/**
+ * Compute the hinge axes between neighbouring base frames
+ * @param array the array allocated for the axes vectors
+ * @param len the number of base frames in one strand
+ * @param strand_I the base frames in strand 1
+ * @param strand_II the base frames in strand 2
+ */
 void get_hinge_axes_intra_array(double array[][3],
                                 int len,
                                 double strand_I[][3][3],
@@ -39,6 +59,13 @@ void get_hinge_axes_intra_array(double array[][3],
     }
 }
 
+/**
+ * Compute the bucklepropeller array
+ * @param len the number of base frames in one strand
+ * @param strand_1 the base frames in strand 1
+ * @param strand_2 the base frames in strand 2
+ * @param bp_array the array allocated for the angle values
+ */
 void create_bucklepropeller_array(int len,
                                   double strand_1[][3][3],
                                   double strand_2[][3][3],
@@ -55,6 +82,12 @@ void create_bucklepropeller_array(int len,
     }
 }
 
+/**
+ * Function to create rotation matrix according to the 3DNA definition
+ * @param matrix the array allocated for the rotation matrix
+ * @param angle the rotation angle
+ * @param hinge_axis the hinge axis
+ */
 void create_rotation_matrix(double matrix[][3],
                             double angle,
                             const double hinge_axis[3]) {
@@ -70,6 +103,16 @@ void create_rotation_matrix(double matrix[][3],
     matrix[2][2] = cos(angle) + (1 - cos(angle)) * (hinge_axis[2] * hinge_axis[2]);
 }
 
+/**
+ * Function to rotate base frames
+ * @param rotated_frames the array allocated for the rotated base frames
+ * @param frames the array of frames to be rotated
+ * @param hinge_axes the array of hinge axes
+ * @param rotation_matrices the array of rotation matrices
+ * @param bp_angle the array of rotation angles
+ * @param multiple the multiple of the rotation angle to be used
+ * @param strand_len the number of base frames in one strand
+ */
 void rotate_frames(double rotated_frames[][3][3],
                    double frames[][3][3],
                    double hinge_axes[][3],
@@ -83,6 +126,13 @@ void rotate_frames(double rotated_frames[][3][3],
     }
 }
 
+/**
+ * Function to create middle frames of neighbouring base frames
+ * @param result the array allocated for the middle frames
+ * @param frames_I the array of base frames in strand 1
+ * @param frames_II the array of base frames in strand 1
+ * @param strand_len the number of base frames in one strand
+ */
 void get_middle_frames_array(double result[][3][3],
                              double frames_I[][3][3],
                              double frames_II[][3][3],
@@ -92,6 +142,13 @@ void get_middle_frames_array(double result[][3][3],
     }
 }
 
+/**
+ * Function to compute origins of the base middle frames
+ * @param result the array allocated for the origin vectors
+ * @param origins_I the array of origins in strand 1
+ * @param origins_II the array of origins in strand 2
+ * @param strand_len the number of base frames in one strand
+ */
 void get_middle_frames_origins_array(double result[][3],
                                      double origins_I[][3],
                                      double origins_II[][3],
@@ -101,6 +158,16 @@ void get_middle_frames_origins_array(double result[][3],
     }
 }
 
+/**
+ * Compute shear, stretch, stagger coordinates
+ * @param shear the array allocated for shear
+ * @param stretch the array allocated for stretch
+ * @param stagger the array allocated for stagger
+ * @param origins_I the array of origins in strand 1
+ * @param origins_II the array of origins in strand 2
+ * @param middle_frames the array of base middle frames
+ * @param strand_len the number of base frames in one strand
+ */
 void get_shear_stretch_stagger(double shear[],
                                double stretch[],
                                double stagger[],
@@ -119,6 +186,14 @@ void get_shear_stretch_stagger(double shear[],
     }
 }
 
+/**
+ * Determine the sign of the opening/twist/phase angle
+ * @param axis_1 the first axis determining the sign
+ * @param axis_2 the second axis determining the sign
+ * @param middle_frames_array the array of middle frames
+ * @param index the index of the middle frame in the array
+ * @return -1 or +1 to multiply the angle with
+ */
 int get_angle_sign(double axis_1[3],
                    double axis_2[3],
                    double middle_frames_array[][3][3],
@@ -136,6 +211,14 @@ int get_angle_sign(double axis_1[3],
     return -1;
 }
 
+/**
+ * Function to compute the opening angle
+ * @param opening_array the array allocated for the angles
+ * @param rotated_frames_I the array of rotated base frames in strand 1
+ * @param rotated_frames_II the array of rotated base frames in strand 2
+ * @param strand_len the number of base frames in one strand
+ * @param middle_frames_array the array of base middle frames
+ */
 void get_opening_angle_array(double opening_array[],
                              double rotated_frames_I[][3][3],
                              double rotated_frames_II[][3][3],
@@ -153,6 +236,13 @@ void get_opening_angle_array(double opening_array[],
     }
 }
 
+/**
+ * Function to compute the phase angle
+ * @param phase the array allocated for the angles
+ * @param hinge_axes the array of hinge axes
+ * @param middle_frames the array of middle frames
+ * @param strand_len the number of base frames in one strand
+ */
 void get_phase_angle_array(double *phase,
                            double hinge_axes[][3],
                            double middle_frames[][3][3],
@@ -167,23 +257,37 @@ void get_phase_angle_array(double *phase,
     }
 }
 
+/**
+ * Compute the buckle and propeller or roll and tilt coordinates
+ * @param buckle the array allocated for the buckle/roll
+ * @param propeller the array allocated for the propeller/tilt
+ * @param bp_array the array of bucklepropeller/rolltilt angles
+ * @param phase_angle the array of phase angles
+ * @param len the length of the arrays
+ */
 void get_bp_or_rt_angle_array(double *buckle,
                               double *propeller,
                               const double *bp_array,
                               double *phase_angle,
-                              int size) {
-    for (int i = 0; i < size; i++) {
+                              int len) {
+    for (int i = 0; i < len; i++) {
         buckle[i] = bp_array[i] * sin(degrees_to_radians(phase_angle[i]));
         propeller[i] = bp_array[i] * cos(degrees_to_radians(phase_angle[i]));
     }
 }
 
+/**
+ * Compute the hinge axes between consecutive base pair frames
+ * @param hinge_axes the array allocated for hinge axes
+ * @param base_pair_frames the array of base pair frames
+ * @param size the length of the array
+ */
 void get_hinge_axes_inter_array(double hinge_axes[][3],
                                 double base_pair_frames[][3][3],
-                                int size) {
+                                int len) {
     double base_pair_z_1[3];
     double base_pair_z_2[3];
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < len; i++) {
         select_frames_axis(base_pair_z_1, base_pair_frames, 'z', i);
         select_frames_axis(base_pair_z_2, base_pair_frames, 'z', i + 1);
 
@@ -192,12 +296,18 @@ void get_hinge_axes_inter_array(double hinge_axes[][3],
     }
 }
 
+/**
+ * Function to compute the rolltilt angles
+ * @param rolltilt the array allocated for the rolltilt angles
+ * @param base_pair_frames the array of base pair frames
+ * @param len the length of the arrays
+ */
 void get_rolltilt_angle_array(double *rolltilt,
                               double base_pair_frames[][3][3],
-                              int size) {
+                              int len) {
     double base_pair_z_1[3];
     double base_pair_z_2[3];
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < len; i++) {
         select_frames_axis(base_pair_z_1, base_pair_frames, 'z', i);
         select_frames_axis(base_pair_z_2, base_pair_frames, 'z', i + 1);
 
@@ -207,17 +317,25 @@ void get_rolltilt_angle_array(double *rolltilt,
     }
 }
 
+/**
+ * Function to compute the base pair middle frames
+ * @param middle_frames the array allocated for the base pair middle frames
+ * @param base_pair_frames the array of base pair frames
+ * @param hinge_axes the array of hinge axes
+ * @param rolltilt the array of rolltilt angles
+ * @param len the length of the base pair middle frames array
+ */
 void get_middle_base_pair_frames_array(double middle_frames[][3][3],
                                        double base_pair_frames[][3][3],
                                        double hinge_axes[][3],
                                        const double rolltilt[],
-                                       int size) {
+                                       int len) {
     double rotation_matrix_1[3][3];
     double rotation_matrix_2[3][3];
     double rotated_matrix_1[3][3];
     double rotated_matrix_2[3][3];
 
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < len; i++) {
         create_rotation_matrix(rotation_matrix_1, rolltilt[i] * 0.5, hinge_axes[i]);
         create_rotation_matrix(rotation_matrix_2, rolltilt[i] * (-0.5), hinge_axes[i]);
 
@@ -228,23 +346,38 @@ void get_middle_base_pair_frames_array(double middle_frames[][3][3],
     }
 }
 
+/**
+ * Compute the base pair middle frames origins
+ * @param origins the array allocated for the origins
+ * @param base_pair_frames_origins the array of base pair frame origins
+ * @param len the length of the array of middle frames origins
+ */
 void get_middle_base_pair_frames_origins_array(double origins[][3],
                                                double base_pair_frames_origins[][3],
-                                               int size) {
-    for (int i = 0; i < size; i++) {
+                                               int len) {
+    for (int i = 0; i < len; i++) {
         average_two_vectors(3, origins[i], base_pair_frames_origins[i], base_pair_frames_origins[i + 1]);
     }
 }
 
+/**
+ * Compute the shift, slide, rise coordinates
+ * @param shift the array allocated for shift
+ * @param slide the array allocated for slide
+ * @param rise the array allocated for rise
+ * @param base_pair_origins the array of base pair frames origins
+ * @param base_pair_middle_frames the array of base pair middle frames
+ * @param len the length of the coordinates arrays
+ */
 void get_shift_slide_rise(double *shift,
                           double *slide,
                           double *rise,
                           double base_pair_origins[][3],
                           double base_pair_middle_frames[][3][3],
-                          int size) {
+                          int len) {
     double origins_difference[3];
     double shift_slide_rise[3];
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < len; i++) {
         subtract_two_vectors(3, origins_difference, base_pair_origins[i + 1], base_pair_origins[i]);
         matrix_vector_multiplication(3, 3, shift_slide_rise, base_pair_middle_frames[i], origins_difference);
         shift[i] = shift_slide_rise[0];
@@ -253,12 +386,21 @@ void get_shift_slide_rise(double *shift,
     }
 }
 
+/**
+ * Compute the twist angle values
+ * @param twist the array allocated for twist
+ * @param rolltilt the array of rolltilt angles
+ * @param hinge_axes the array of hinge axes
+ * @param base_pair_frames the array of base pair frames
+ * @param middle_frames the array of base pair middle frames
+ * @param len the length of the twist array
+ */
 void get_twist_array(double *twist,
                      const double rolltilt[],
                      double hinge_axes[][3],
                      double base_pair_frames[][3][3],
                      double middle_frames[][3][3],
-                     int size) {
+                     int len) {
 
     double rotation_matrix_1[3][3];
     double rotation_matrix_2[3][3];
@@ -267,7 +409,7 @@ void get_twist_array(double *twist,
     double rotated_matrix_y_axis_1[3];
     double rotated_matrix_y_axis_2[3];
 
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < len; i++) {
 
         create_rotation_matrix(rotation_matrix_1, rolltilt[i] * 0.5, hinge_axes[i]);
         create_rotation_matrix(rotation_matrix_2, rolltilt[i] * (-0.5), hinge_axes[i]);
@@ -286,11 +428,25 @@ void get_twist_array(double *twist,
     }
 }
 
+/**
+ * Function to free middle frames and origins arrays
+ * @param mfi the array of base middle frames
+ * @param mfio the array of origins
+ */
 void free_3dna_arrays(double mfi[][3][3], double mfio[][3]) {
     free(mfi);
     free(mfio);
 }
 
+/**
+ * Function to free arrays allocated in the process of computing intra base pair coordinates
+ * @param ha the array of hinge axes
+ * @param bp the array of bucklepropeller angles
+ * @param rm the array of rotation matrices
+ * @param rm1 the array of rotated matrices in strand 1
+ * @param rm2 the array of rotated matrices in strand 2
+ * @param pa the array of phase angles
+ */
 void
 free_intra_arrays(double ha[][3], double bp[], double rm[][3][3], double rm1[][3][3], double rm2[][3][3], double pa[]) {
     free(ha);
@@ -301,6 +457,22 @@ free_intra_arrays(double ha[][3], double bp[], double rm[][3][3], double rm1[][3
     free(pa);
 }
 
+/**
+ * Function to compute intra base frame coordinates
+ * @param frames_1 the array of base frames in strand 1
+ * @param frames_2 the array of base frames in strand 2
+ * @param origins_1 the array of origins in strand 1
+ * @param origins_2 the array of origins in strand 2
+ * @param middle_frames the array of base middle frames
+ * @param middle_frames_origins the array of base middle frame origins
+ * @param shear the array allocated for shear
+ * @param stretch the array allocated for stretch
+ * @param stagger the array allocated for stagger
+ * @param buckle the array allocated for buckle
+ * @param propeller the array allocated for propeller
+ * @param opening the array allocated for opening
+ * @param strand_len the number of base frames in one strand
+ */
 void get_intra_coordinates(double frames_1[][3][3], double frames_2[][3][3], double origins_1[][3],
                            double origins_2[][3], double middle_frames[][3][3], double middle_frames_origins[][3],
                            double shear[], double stretch[], double stagger[], double buckle[], double propeller[],
@@ -329,6 +501,14 @@ void get_intra_coordinates(double frames_1[][3][3], double frames_2[][3][3], dou
                       rotated_matrices_strand_II, phase_angle_array_base_frames);
 }
 
+/**
+ * Function to free arrays allocated in the process of computing the inter base pair coordinates
+ * @param ha the array of hinge axes
+ * @param rt the array of rolltilt angles
+ * @param mf the array of base pair middle frames
+ * @param mfo the array of base pair middle frame origins
+ * @param pa the array of phase angles
+ */
 void free_inter_arrays(double ha[][3], double rt[], double mf[][3][3], double mfo[][3], double pa[]) {
     free(ha);
     free(rt);
@@ -337,6 +517,18 @@ void free_inter_arrays(double ha[][3], double rt[], double mf[][3][3], double mf
     free(pa);
 }
 
+/**
+ * Fucntion to compute inter base pair coordinates
+ * @param frames the array of base pair frames
+ * @param frames_origins the array of base pair frame origins
+ * @param shift the array for shift
+ * @param slide the array for slide
+ * @param rise the array for rise
+ * @param roll the array for roll
+ * @param tilt the array for tilt
+ * @param twist the array for twist
+ * @param inter_len the length of the inter base pair coordinate arrays
+ */
 void get_inter_coordinates(double frames[][3][3], double frames_origins[][3], double shift[], double slide[],
                            double rise[], double roll[], double tilt[], double twist[], int inter_len) {
     double (*hinge_axes_array_inter)[3] = malloc(inter_len * sizeof(*hinge_axes_array_inter));
@@ -361,6 +553,25 @@ void get_inter_coordinates(double frames[][3][3], double frames_origins[][3], do
                       middle_base_pair_frames_origins_array, phase_angle_array_base_pair_frames);
 }
 
+/**
+ * Function to compute all the internal coordinates according to the 3DNA definition
+ * @param frames_1 the array of base frames in strand 1
+ * @param frames_2 the array of base frames in strand 2
+ * @param origins_1 the array of origins in strand 1
+ * @param origins_2 the array of origins in strand 2
+ * @param shear the array for shear
+ * @param stretch the array for stretch
+ * @param stagger the array for stagger
+ * @param buckle the array for buckle
+ * @param propeller the array for propeller
+ * @param opening the array for opening
+ * @param shift the array for shift
+ * @param slide the array for slide
+ * @param rise the array for rise
+ * @param roll the array for roll
+ * @param tilt the array for tilt
+ * @param twist the array for twist
+ */
 void get_3dna_coordinates(double frames_1[][3][3], double frames_2[][3][3], double origins_1[][3],
                           double origins_2[][3], double shear[], double stretch[], double stagger[], double buckle[],
                           double propeller[], double opening[], double shift[], double slide[], double rise[],
