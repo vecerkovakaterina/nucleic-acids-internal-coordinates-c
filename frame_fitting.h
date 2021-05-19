@@ -42,6 +42,15 @@ typedef struct Eig {
     double eigen_value;
 } eig;
 
+/**
+ * Read purine atom coordinates from pdb file
+ * @param r purine residuum
+ * @param res_name nucleotide letter symbol (A, G)
+ * @param atom_name purine residuum atom label
+ * @param x atom coordinate
+ * @param y atom coordinate
+ * @param z atom coordinate
+ */
 void read_purine(residuum *r, const char res_name[], char atom_name[], double x, double y, double z) {
     r->nucleotide = res_name[1];
     r->is_purine = 1;
@@ -86,6 +95,15 @@ void read_purine(residuum *r, const char res_name[], char atom_name[], double x,
     }
 }
 
+/**
+ * Read pyrimidine atom coordinates from pdb file
+ * @param r pyrimidine residuum
+ * @param res_name nucleotide letter symbol (C, T, U)
+ * @param atom_name pyrimdiine residuum atom label
+ * @param x atom coordinate
+ * @param y atom coordinate
+ * @param z atom coordinate
+ */
 void read_pyrimidine(residuum *r, const char res_name[], char atom_name[], double x, double y, double z) {
     r->nucleotide = res_name[1];
     r->is_purine = 0;
@@ -118,6 +136,11 @@ void read_pyrimidine(residuum *r, const char res_name[], char atom_name[], doubl
     }
 }
 
+/**
+ * Read and store the experimental frames from pdb file
+ * @param fp the pdb file pointer
+ * @param snapshot the array allocated for experimental frames
+ */
 void read_file(FILE *fp, residuum snapshot[]) {
 
     char line[256];
@@ -147,6 +170,10 @@ void read_file(FILE *fp, residuum snapshot[]) {
     }
 }
 
+/**
+ * Create the standard frame for guanine
+ * @param g purine struct to store coordinates
+ */
 void create_standard_frame_G(purine *g) {
     g->N9[0] = -1.289;
     g->N9[1] = 4.551;
@@ -168,6 +195,10 @@ void create_standard_frame_G(purine *g) {
     g->C4[1] = 3.177;
 }
 
+/**
+ * Create the standard frame for adenine
+ * @param a purine struct to store coordinates
+ */
 void create_standard_frame_A(purine *a) {
     a->N9[0] = -1.291;
     a->N9[1] = 4.498;
@@ -189,6 +220,10 @@ void create_standard_frame_A(purine *a) {
     a->C4[1] = 3.124;
 }
 
+/**
+ * Create standard frame for cytosine
+ * @param c pyrimidine struct to store coordinates
+ */
 void create_standard_frame_C(pyrimidine *c) {
     c->N1[0] = -1.285;
     c->N1[1] = 4.542;
@@ -204,6 +239,10 @@ void create_standard_frame_C(pyrimidine *c) {
     c->C6[1] = 5.068;
 }
 
+/**
+ * Create the standard frame for thymine
+ * @param t pyrimidine struct to store coordinates
+ */
 void create_standard_frame_T(pyrimidine *t) {
     t->N1[0] = -1.284;
     t->N1[1] = 4.500;
@@ -219,6 +258,10 @@ void create_standard_frame_T(pyrimidine *t) {
     t->C6[1] = 5.057;
 }
 
+/**
+ * Create the standard frame for uracil
+ * @param u pyrimidine struct to store coordinates
+ */
 void create_standard_frame_U(pyrimidine *u) {
     u->N1[0] = -1.284;
     u->N1[1] = 4.500;
@@ -234,6 +277,14 @@ void create_standard_frame_U(pyrimidine *u) {
     u->C6[1] = 5.053;
 }
 
+/**
+ * Function to create all the standard frames
+ * @param G guanine struct
+ * @param A adenine struct
+ * @param C cytosine struct
+ * @param T thymine struct
+ * @param U uracil struct
+ */
 void create_standard_frames(purine *G, purine *A, pyrimidine *C, pyrimidine *T, pyrimidine *U) {
     create_standard_frame_G(G);
     create_standard_frame_A(A);
@@ -242,6 +293,14 @@ void create_standard_frames(purine *G, purine *A, pyrimidine *C, pyrimidine *T, 
     create_standard_frame_U(U);
 }
 
+/**
+ * Function to get an atom coordinate vector from purine struct.
+ * Enables iterating over atoms.
+ * If index not in range 0-8, the first atom will be returned.
+ * @param r purine struct
+ * @param i atom index (0-8)
+ * @return
+ */
 double *get_atom_from_purine_struct(purine *r, int i) {
     switch (i) {
         case 0:
@@ -267,6 +326,14 @@ double *get_atom_from_purine_struct(purine *r, int i) {
     }
 }
 
+/**
+ * Function to get an atom coordinate vector from pyrimidine struct.
+ * Enables iterating over atoms.
+ * If index not in range 0-5, the first atom will be returned.
+ * @param r pyrimidine struct
+ * @param i index (0-5)
+ * @return
+ */
 double *get_atom_from_pyrimidine_struct(pyrimidine *r, int i) {
     switch (i) {
         case 0:
@@ -286,6 +353,11 @@ double *get_atom_from_pyrimidine_struct(pyrimidine *r, int i) {
     }
 }
 
+/**
+ * Create matrix with coordinate vectors as rows from purine struct
+ * @param matrix the array allocated for the matrix
+ * @param residuum purine struct
+ */
 void matrix_from_purine_residuum(double matrix[9][3], purine residuum) {
     for (int i = 0; i < 9; i++) {
         double *atomic_coords = get_atom_from_purine_struct(&residuum, i);
@@ -295,6 +367,11 @@ void matrix_from_purine_residuum(double matrix[9][3], purine residuum) {
     }
 }
 
+/**
+ * Create matrix with coordinate vectors as rows from pyrimidine struct
+ * @param matrix the array allocated for the matrix
+ * @param residuum pyrimidien struct
+ */
 void matrix_from_pyrimidine_residuum(double matrix[6][3], pyrimidine residuum) {
     for (int i = 0; i < 6; i++) {
         double *atomic_coords = get_atom_from_pyrimidine_struct(&residuum, i);
@@ -304,7 +381,12 @@ void matrix_from_pyrimidine_residuum(double matrix[6][3], pyrimidine residuum) {
     }
 }
 
-
+/**
+ * Create covariance matrix from purine base frame
+ * @param cm the array allocated for the covariance matrix
+ * @param experimental the purine experimental frame
+ * @param standard the purine standard frame
+ */
 void create_covariance_matrix_purine(double cm[3][3], purine experimental, purine standard) {
     double ones[9][1] = {{1},
                          {1},
@@ -345,6 +427,12 @@ void create_covariance_matrix_purine(double cm[3][3], purine experimental, purin
     //(1/no_atoms-1)(m2 - (1/no_atoms)*m1)
 }
 
+/**
+ * Create covariance matrix from pyrimidine base frame
+ * @param cm the array allocated for the covariance matrix
+ * @param experimental the pyrimidine experimental frame
+ * @param standard the pyrimidine standard frame
+ */
 void create_covariance_matrix_pyrimidine(double cm[3][3], pyrimidine experimental, pyrimidine standard) {
     double ones[6][1] = {{1},
                          {1},
@@ -383,6 +471,17 @@ void create_covariance_matrix_pyrimidine(double cm[3][3], pyrimidine experimenta
     //(1/no_atoms-1)(m2 - (1/no_atoms)*m1)
 }
 
+/**
+ * Function to get covariance matrices from all bases in snapshot
+ * @param cm the array allocated for the covariance matrices
+ * @param snapshot the array of base experimental frames
+ * @param len the number of base frames in snapshot
+ * @param std_A the standard frame for adenine
+ * @param std_G the standard frame for guanine
+ * @param std_C the standard frame for cytosine
+ * @param std_T the standard frame for thymine
+ * @param std_U the standard frame for uracil
+ */
 void get_covariance_matrices(double cm[][3][3], residuum snapshot[], int len, purine std_A, purine std_G,
                              pyrimidine std_C, pyrimidine std_T, pyrimidine std_U) {
     for (int i = 0; i < len; i++) {
@@ -409,6 +508,12 @@ void get_covariance_matrices(double cm[][3][3], residuum snapshot[], int len, pu
     }
 }
 
+/**
+ * Function to get symmetric matrices from covariance matrices
+ * @param sm the array allocated for symmetric matrices
+ * @param cm the array of covariance matrices
+ * @param len the number of base frames in snapshot
+ */
 void get_symmetric_matrices(double sm[][4][4], double cm[][3][3], int len) {
     for (int i = 0; i < len; i++) {
         sm[i][0][0] = cm[i][0][0] + cm[i][1][1] + cm[i][2][2];
@@ -433,6 +538,11 @@ void get_symmetric_matrices(double sm[][4][4], double cm[][3][3], int len) {
     }
 }
 
+/**
+ * Find the index of the largest eigenvalue in an array
+ * @param eigenvalues array
+ * @return the index
+ */
 int find_index_largest_eigenvalue(const double eigenvalues[4]) {
     int index = 0;
     double max = eigenvalues[0];
@@ -445,6 +555,11 @@ int find_index_largest_eigenvalue(const double eigenvalues[4]) {
     return index;
 }
 
+/**
+ * Function to find the largest eigenvalue and its corresponding eigenvector
+ * @param e eig struct
+ * @param sm the symmetric matrix to find the eigenvalues of
+ */
 void find_largest_eigenvalue(eig *e, double sm[4][4]) {
     double *mem, *eigvalue_r, *eigvalue_i, *eigvec;
     mem = (double *) calloc(4 * 4 + 10, sizeof(double));
@@ -461,6 +576,12 @@ void find_largest_eigenvalue(eig *e, double sm[4][4]) {
     e->eigen_vector[3] = -eigvec[12 + index];
 }
 
+/**
+ * Function to compute rotation matrices (the fitted frames) from symmetric matrices
+ * @param rm the array allocated for rotation matrices
+ * @param sm the array of symmetric matrices
+ * @param len the number of base frames in snapshot
+ */
 void get_rotation_matrices(double rm[][3][3], double sm[][4][4], int len) {
     eig eig;
     for (int i = 0; i < len; i++) {
@@ -482,6 +603,18 @@ void get_rotation_matrices(double rm[][3][3], double sm[][4][4], int len) {
     }
 }
 
+/**
+ * Function to compute the origin vectors (the fitted frames origins) of rotation matrices
+ * @param origins the array allocated for origin vectors
+ * @param snapshot the array of experimental frames
+ * @param rotation_matrices the array of rotation matrices
+ * @param len the number of base frames in snapshot
+ * @param std_A the adenine standard frame
+ * @param std_G the guanine standard frame
+ * @param std_C the cytosine standard frame
+ * @param std_T the thymine standard frame
+ * @param std_U the uracil standard frame
+ */
 void get_rotation_matrices_origins(double origins[][3], residuum snapshot[], double rotation_matrices[][3][3],
                                    int len, purine std_A, purine std_G, pyrimidine std_C, pyrimidine std_T,
                                    pyrimidine std_U) {
@@ -524,6 +657,18 @@ void get_rotation_matrices_origins(double origins[][3], residuum snapshot[], dou
     }
 }
 
+/**
+ * Function to split snapshot into reference strand 1 and complementary strand 1.
+ * The reference strand 1 is in 5' --> 3' direction,
+ * the complementary strand 2 is in 3' --> 5' direction.
+ * @param snapshot the array of fitted base frames
+ * @param snapshot_origins the array of fitted base frames origins
+ * @param frames_1 the array allocated for reference strand base frames
+ * @param frames_2 the array allocated for complementary strand base frames
+ * @param origins_1 the array allocated for reference strand base frames origins
+ * @param origins_2 the array allocated for complementary strand base frames origins
+ * @param len the length of base frames array
+ */
 void split_snapshot_into_strands(double snapshot[][3][3], double snapshot_origins[][3], double frames_1[][3][3],
                                  double frames_2[][3][3], double origins_1[][3], double origins_2[][3], int len) {
     memcpy(frames_1, snapshot, len * sizeof(*frames_1));
@@ -537,6 +682,12 @@ void split_snapshot_into_strands(double snapshot[][3][3], double snapshot_origin
     }
 }
 
+/**
+ * Function to rotate frames in complementary strand 180 degrees around x axis
+ * @param rotated the array allocated for rotated base frames
+ * @param to_rotate the array of base frames to rotate
+ * @param len the length of the array of frames to rotate
+ */
 void rotate_strand_2_x_180_deg(double rotated[][3][3], double to_rotate[][3][3], int len) {
     double x_rot_180[3][3] = {{1., 0.,  0.},
                               {0., -1., 0.},
@@ -546,6 +697,14 @@ void rotate_strand_2_x_180_deg(double rotated[][3][3], double to_rotate[][3][3],
     }
 }
 
+/**
+ * Free arrays allocated in the process of fitting base frames
+ * @param cm the array of covariance matrices
+ * @param sm the array od symmetric matrices
+ * @param rm the array of rotation matrices
+ * @param o the array of rotation matrices origins
+ * @param fr the array of base frames in strand 2 before rotation
+ */
 void
 free_frame_fitting_arrays(double cm[][3][3], double sm[][4][4], double rm[][3][3], double o[][3], double fr[][3][3]) {
     free(cm);
@@ -555,6 +714,14 @@ free_frame_fitting_arrays(double cm[][3][3], double sm[][4][4], double rm[][3][3
     free(fr);
 }
 
+/**
+ * Function to fit standard base frames onto the experimental frames from pdb file
+ * @param fp the pdb file pointer
+ * @param frames_strand_1 the array allocated for base frames in strand 1
+ * @param frames_strand_2 the array allocated for base frames in strand 2
+ * @param origins_strand_1 the array allocated for base frame origins in strand 1
+ * @param origins_strand_2 the array allocated for base frame origins in strand 2
+ */
 void fit_frames(FILE *fp, double frames_strand_1[][3][3], double frames_strand_2[][3][3], double origins_strand_1[][3],
                 double origins_strand_2[][3]) {
 
@@ -590,45 +757,3 @@ void fit_frames(FILE *fp, double frames_strand_1[][3][3], double frames_strand_2
     free_frame_fitting_arrays(covariance_matrices, symmetric_matrices, rotation_matrices, origins,
                               frames_strand_2_to_rotate);
 }
-
-#ifdef CMAKE_FINAL_THESIS_C_FRAME_FITTING_H
-
-int main() {
-
-    FILE *fp = fopen("../teplota.300.pdb.1", "r"); // ../ for running in ide, without for running in terminal
-    residuum snapshot[SNAPSHOT_ARRAY_LENGTH];
-    read_file(fp, snapshot);
-    fclose(fp);
-
-    purine standard_G, standard_A;
-    pyrimidine standard_C, standard_T, standard_U;
-    create_standard_frames(&standard_G, &standard_A, &standard_C, &standard_T, &standard_U);
-
-    double (*covariance_matrices)[3][3] = malloc(snapshot_len * sizeof(*covariance_matrices));
-    get_covariance_matrices(covariance_matrices, snapshot, snapshot_len, standard_A, standard_G, standard_C, standard_T,
-                            standard_U);
-
-    double (*symmetric_matrices)[4][4] = malloc(snapshot_len * sizeof(*symmetric_matrices));
-    get_symmetric_matrices(symmetric_matrices, covariance_matrices, snapshot_len);
-
-    double (*rotation_matrices)[3][3] = malloc(snapshot_len * sizeof(*rotation_matrices));
-    get_rotation_matrices(rotation_matrices, symmetric_matrices, snapshot_len);
-
-    double (*origins)[3] = malloc(snapshot_len * sizeof(*origins));
-    get_rotation_matrices_origins(origins, snapshot, rotation_matrices, snapshot_len, standard_A, standard_G,
-                                  standard_C, standard_T, standard_U);
-
-    int strand_len = snapshot_len / 2;
-    double (*frames_strand_1)[3][3] = malloc(strand_len * sizeof(*frames_strand_1));
-    double (*frames_strand_2_to_rotate)[3][3] = malloc(strand_len * sizeof(*frames_strand_2_to_rotate));
-    double (*origins_strand_1)[3] = malloc(strand_len * sizeof(*origins_strand_1));
-    double (*origins_strand_2)[3] = malloc(strand_len * sizeof(*origins_strand_2));
-    split_snapshot_into_strands(rotation_matrices, origins, frames_strand_1, frames_strand_2_to_rotate,
-                                origins_strand_1, origins_strand_2, strand_len);
-
-    double (*frames_strand_2)[3][3] = malloc(strand_len * sizeof(*frames_strand_2));
-    rotate_strand_2_x_180_deg(frames_strand_2, frames_strand_2_to_rotate, strand_len);
-
-    return 0;
-
-#endif //CMAKE_FINAL_THESIS_C_FRAME_FITTING_H
