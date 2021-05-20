@@ -80,6 +80,10 @@ void write_to_bp_output_file(int pdb_number, char output_path[], double shear[],
                  buckle[i], propeller[i], opening[i]);
 
         FILE *fp = fopen(filename_output, "a");
+        if (fp == NULL){
+            printf("ERROR: Specified output directory does not exist! %s\n", output_path);
+            return;
+        }
         fputs(bp_prm_to_append, fp);
         fclose(fp);
     }
@@ -107,6 +111,10 @@ void write_to_bp_step_output_file(int pdb_number, char output_path[], double shi
                  rise[i], roll[i], tilt[i], twist[i]);
 
         FILE *fp = fopen(filename_output, "a");
+        if (fp == NULL){
+            printf("ERROR: Specified output directory does not exist! %s\n", output_path);
+            return;
+        }
         fputs(bp_prm_to_append, fp);
         fclose(fp);
     }
