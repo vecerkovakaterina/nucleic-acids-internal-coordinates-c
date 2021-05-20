@@ -199,19 +199,20 @@ int run_cgdna(char filename[], char output_path[], int pdb_number){
 
 int main(int argc, char *argv[]) {
 
-    if (argc != 5) {
-        printf("USAGE: ./coordinates [3dna|curves|cgdna] number_of_snapshots pdb_files_path output_files_path\n");
+    if (argc != 9 || (strcmp(argv[1], "-c") != 0) || (strcmp(argv[3], "-n") != 0) || (strcmp(argv[5], "-i") != 0) ||
+            (strcmp(argv[7], "-o") != 0)) {
+        printf("USAGE: ./coordinates -c [3dna|curves|cgdna] -n number_of_snapshots -i pdb_files_path -o output_files_path\n");
         return 1;
     }
 
     char coords_type[10] = "3dna";
-    strcpy(coords_type, argv[1]);
+    strcpy(coords_type, argv[2]);
     char *ptr;
-    long number_snapshots = strtol(argv[2], &ptr, 10);
+    long number_snapshots = strtol(argv[4], &ptr, 10);
     char input_path[FILE_PATH_SIZE] = "./";
-    strcpy(input_path, argv[3]);
+    strcpy(input_path, argv[6]);
     char output_path[FILE_PATH_SIZE] = "./";
-    strcpy(output_path, argv[4]);
+    strcpy(output_path, argv[8]);
     char *filename = strrchr( input_path, '/');
     filename++;
 
