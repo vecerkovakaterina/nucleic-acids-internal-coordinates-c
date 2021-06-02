@@ -207,9 +207,9 @@ int run_cgdna(char filename[], char output_path[], int pdb_number){
 
 int main(int argc, char *argv[]) {
 
-    if (argc != 9 || (strcmp(argv[1], "-c") != 0) || (strcmp(argv[3], "-n") != 0) || (strcmp(argv[5], "-i") != 0) ||
+    if (argc != 9 || (strcmp(argv[1], "-t") != 0) || (strcmp(argv[3], "-n") != 0) || (strcmp(argv[5], "-i") != 0) ||
             (strcmp(argv[7], "-o") != 0)) {
-        printf("USAGE: ./coordinates -c [3dna|curves|cgdna] -n number_of_snapshots -i pdb_files_path -o output_files_path\n");
+        printf("USAGE: ./coordinates -t [3dna|curves|cgdna] -n number_of_snapshots -i pdb_files_path -o output_files_path\n");
         return 1;
     }
 
