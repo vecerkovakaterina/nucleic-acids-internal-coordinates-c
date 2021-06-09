@@ -756,4 +756,6 @@ void fit_frames(FILE *fp, double frames_strand_1[][3][3], double frames_strand_2
     rotate_strand_2_x_180_deg(frames_strand_2, frames_strand_2_to_rotate, strand_len);
     free_frame_fitting_arrays(covariance_matrices, symmetric_matrices, rotation_matrices, origins,
                               frames_strand_2_to_rotate);
+
+
 }
