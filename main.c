@@ -236,7 +236,7 @@ free_inter_coordinates_arrays(double *shift, double *slide, double *rise, double
  * @param filename input pdb file with snapshot
  * @return value computation successful (0) or file not found (1)
  */
-int run_3dna(char filename_number[], char output_path[], int pdb_number){
+int run_3dna(char filename_number[], char output_path[], int pdb_number) {
     FILE *fp = fopen(filename_number, "r");
     if (fp == NULL) {
         printf("ERROR: Input file %s not found!\n", filename_number);
@@ -255,8 +255,13 @@ int run_3dna(char filename_number[], char output_path[], int pdb_number){
     get_3dna_coordinates(frames_strand_1, frames_strand_2, origins_strand_1, origins_strand_2, shear, stretch,
                          stagger, buckle, propeller, opening, shift, slide, rise, roll, tilt, twist);
 
+    free_frames_and_origins(frames_strand_1, frames_strand_2, origins_strand_1, origins_strand_2);
+
     write_to_bp_output_file(pdb_number, output_path, shear, stretch, stagger, buckle, propeller, opening);
     write_to_bp_step_output_file(pdb_number, output_path, shift, slide, rise, roll, tilt, twist);
+
+    free_intra_coordinates_arrays(shear, stretch, stagger, buckle, propeller, opening);
+    free_inter_coordinates_arrays(shift, slide, rise, roll, tilt, twist);
     return 0;
 }
 
@@ -265,7 +270,7 @@ int run_3dna(char filename_number[], char output_path[], int pdb_number){
  * @param filename input pdb file with snapshot
  * @return value computation successful (0) or file not found (1)
  */
-int run_curves(char filename[], char output_path[], int pdb_number){
+int run_curves(char filename[], char output_path[], int pdb_number) {
     FILE *fp = fopen(filename, "r");
     if (fp == NULL) {
         printf("ERROR: Input file %s not found!\n", filename);
@@ -283,17 +288,23 @@ int run_curves(char filename[], char output_path[], int pdb_number){
     get_curves_coordinates(frames_strand_1, frames_strand_2, origins_strand_1, origins_strand_2, shear, stretch,
                            stagger, buckle, propeller, opening, shift, slide, rise, roll, tilt, twist);
 
+    free_frames_and_origins(frames_strand_1, frames_strand_2, origins_strand_1, origins_strand_2);
+
     write_to_bp_output_file(pdb_number, output_path, shear, stretch, stagger, buckle, propeller, opening);
     write_to_bp_step_output_file(pdb_number, output_path, shift, slide, rise, roll, tilt, twist);
+
+    free_intra_coordinates_arrays(shear, stretch, stagger, buckle, propeller, opening);
+    free_inter_coordinates_arrays(shift, slide, rise, roll, tilt, twist);
     return 0;
 }
+
 
 /**
  * Run the computation of cgDNA definition of internal coordinates
  * @param filename input pdb file with snapshot
  * @return value computation successful (0) or file not found (1)
  */
-int run_cgdna(char filename[], char output_path[], int pdb_number){
+int run_cgdna(char filename[], char output_path[], int pdb_number) {
     FILE *fp = fopen(filename, "r");
     if (fp == NULL) {
         printf("ERROR: Input file %s not found!\n", filename);
@@ -311,8 +322,13 @@ int run_cgdna(char filename[], char output_path[], int pdb_number){
     get_cgdna_coordinates(frames_strand_1, frames_strand_2, origins_strand_1, origins_strand_2, shear, stretch,
                           stagger, buckle, propeller, opening, shift, slide, rise, roll, tilt, twist);
 
+    free_frames_and_origins(frames_strand_1, frames_strand_2, origins_strand_1, origins_strand_2);
+
     write_to_bp_output_file(pdb_number, output_path, shear, stretch, stagger, buckle, propeller, opening);
     write_to_bp_step_output_file(pdb_number, output_path, shift, slide, rise, roll, tilt, twist);
+
+    free_intra_coordinates_arrays(shear, stretch, stagger, buckle, propeller, opening);
+    free_inter_coordinates_arrays(shift, slide, rise, roll, tilt, twist);
     return 0;
 }
 
