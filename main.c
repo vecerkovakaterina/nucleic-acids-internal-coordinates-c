@@ -108,7 +108,7 @@ void write_to_bp_step_output_file(int pdb_number, char output_path[], double shi
     int inter_len = (int) (snapshot_len / 2) - 1;
     for (int i = 0; i < inter_len; i++) {
         char filename_output[FILE_PATH_SIZE] = "\0";
-        snprintf(filename_output, FILE_PATH_SIZE, "%s_bp_step_%d.out", output_path, i + 1);
+        snprintf(filename_output, FILE_PATH_SIZE, "%s_step_%d.out", output_path, i + 1);
         char bp_prm_to_append[BUFFER_SIZE] = "\0";
         snprintf(bp_prm_to_append, BUFFER_SIZE, "%d\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\n", pdb_number, shift[i],
                  slide[i],
