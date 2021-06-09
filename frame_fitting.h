@@ -152,6 +152,7 @@ void read_file(FILE *fp, residuum snapshot[]) {
     char atom_symbol;
 
     int residuum_number = 0;
+    snapshot_len = 0;
 
     while (!feof(fp)) {
         do {
