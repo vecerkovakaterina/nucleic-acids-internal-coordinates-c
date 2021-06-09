@@ -725,7 +725,7 @@ free_frame_fitting_arrays(double cm[][3][3], double sm[][4][4], double rm[][3][3
 void fit_frames(FILE *fp, double frames_strand_1[][3][3], double frames_strand_2[][3][3], double origins_strand_1[][3],
                 double origins_strand_2[][3]) {
 
-    residuum snapshot[SNAPSHOT_ARRAY_LENGTH];
+    residuum snapshot[RESIDUUM_ARRAY_LENGTH];
     read_file(fp, snapshot);
     fclose(fp);
 
