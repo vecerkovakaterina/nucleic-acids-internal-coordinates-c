@@ -348,15 +348,15 @@ int main(int argc, char *argv[]) {
     strcpy(input_path, argv[6]);
     char output_path[FILE_PATH_SIZE] = "./";
     strcpy(output_path, argv[8]);
-    char *filename = strrchr( input_path, '/');
+    char *filename = strrchr(input_path, '/');
     filename++;
 
     if (strcmp(coords_type, "3dna") == 0) {
-        for(int i = 1; i <= number_snapshots; i++){
+        for (int i = 1; i <= number_snapshots; i++) {
             char filename_number[FILE_PATH_SIZE] = "\0";
             snprintf(filename_number, FILE_PATH_SIZE, "%s%d", input_path, i);
 
-            if(run_3dna(filename_number, output_path, i) == 1){
+            if (run_3dna(filename_number, output_path, i) == 1) {
                 return 1;
             }
         }
@@ -365,16 +365,16 @@ int main(int argc, char *argv[]) {
             char filename_number[FILE_PATH_SIZE] = "\0";
             snprintf(filename_number, FILE_PATH_SIZE, "%s%d", input_path, i);
 
-            if(run_curves(filename_number, output_path, i) == 1){
+            if (run_curves(filename_number, output_path, i) == 1) {
                 return 1;
             }
         }
     } else if (strcmp(coords_type, "cgdna") == 0) {
-        for(int i = 1; i <= number_snapshots; i++){
+        for (int i = 1; i <= number_snapshots; i++) {
             char filename_number[FILE_PATH_SIZE] = "\0";
             snprintf(filename_number, FILE_PATH_SIZE, "%s%d", input_path, i);
 
-            if(run_cgdna(filename_number, output_path, i) == 1){
+            if (run_cgdna(filename_number, output_path, i) == 1) {
                 return 1;
             }
         }
