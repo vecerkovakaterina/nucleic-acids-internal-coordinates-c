@@ -4,9 +4,8 @@
 #include "lh3.h"
 #include "lingebra.h"
 
-//todo sort snapshot array length
-#define SNAPSHOT_ARRAY_LENGTH 100
 int snapshot_len = 0;
+#define RESIDUUM_ARRAY_LENGTH 400
 
 typedef struct Purine {
     double N9[3];
