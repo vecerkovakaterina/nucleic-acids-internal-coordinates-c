@@ -335,12 +335,12 @@ int run_cgdna(char filename[], char output_path[], int pdb_number) {
 int main(int argc, char *argv[]) {
 
     if (argc != 9 || (strcmp(argv[1], "-t") != 0) || (strcmp(argv[3], "-n") != 0) || (strcmp(argv[5], "-i") != 0) ||
-            (strcmp(argv[7], "-o") != 0)) {
-        printf("USAGE: ./coordinates -t [3dna|curves|cgdna] -n number_of_snapshots -i pdb_files_path -o output_files_path\n");
+        (strcmp(argv[7], "-o") != 0)) {
+        printf("USAGE: ./coordinates -t [3dna|curvesplus|cgdna] -n number_of_snapshots -i pdb_files_path -o output_files_path\n");
         return 1;
     }
 
-    char coords_type[10] = "3dna";
+    char coords_type[15] = "3dna";
     strcpy(coords_type, argv[2]);
     char *ptr;
     long number_snapshots = strtol(argv[4], &ptr, 10);
@@ -360,8 +360,8 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
         }
-    } else if (strcmp(coords_type, "curves") == 0) {
-        for(int i = 1; i <= number_snapshots; i++){
+    } else if (strcmp(coords_type, "curvesplus") == 0) {
+        for (int i = 1; i <= number_snapshots; i++) {
             char filename_number[FILE_PATH_SIZE] = "\0";
             snprintf(filename_number, FILE_PATH_SIZE, "%s%d", input_path, i);
 
