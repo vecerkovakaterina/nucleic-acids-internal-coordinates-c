@@ -71,17 +71,18 @@ void allocate_coordinates_arrays(double **shear, double **stretch, double **stag
  * @param opening the opening array
  */
 void write_to_bp_output_file(int pdb_number, char output_path[], double shear[], double stretch[], double stagger[],
-                             double buckle[], double propeller[], double opening[]){
-    int intra_len = (int)(snapshot_len / 2);
-    for(int i = 1; i <= intra_len; i++){
+                             double buckle[], double propeller[], double opening[]) {
+    int intra_len = (int) (snapshot_len / 2);
+    for (int i = 0; i < intra_len; i++) {
         char filename_output[FILE_PATH_SIZE] = "\0";
-        snprintf(filename_output, FILE_PATH_SIZE, "%s_bp_prm_%d.out", output_path, i);
+        snprintf(filename_output, FILE_PATH_SIZE, "%s_bp_%d.out", output_path, i + 1);
         char bp_prm_to_append[BUFFER_SIZE] = "\0";
-        snprintf(bp_prm_to_append, BUFFER_SIZE, "%d\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\n", pdb_number, shear[i], stretch[i], stagger[i],
+        snprintf(bp_prm_to_append, BUFFER_SIZE, "%d\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\n", pdb_number, shear[i],
+                 stretch[i], stagger[i],
                  buckle[i], propeller[i], opening[i]);
 
         FILE *fp = fopen(filename_output, "a");
-        if (fp == NULL){
+        if (fp == NULL) {
             printf("ERROR: Specified output directory does not exist! %s\n", output_path);
             return;
         }
