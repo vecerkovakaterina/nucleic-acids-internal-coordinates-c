@@ -4,8 +4,9 @@
 #include "cgdna_coordinates.h"
 #include "3dna_coordinates.h"
 
-#define BUFFER_SIZE 100
-#define FILE_PATH_SIZE 100
+#define BUFFER_SIZE 500
+#define FILE_PATH_SIZE 1000
+#define SNAPSHOT_ARRAY_LENGTH 40
 
 /**
  * Allocate memory space for frames and origins arrays
