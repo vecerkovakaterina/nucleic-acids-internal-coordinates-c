@@ -360,6 +360,8 @@ void get_curves_coordinates(double frames_1[][3][3], double frames_2[][3][3], do
     get_inter_translational_coords(shift, slide, rise, inter_middle_frames, intra_middle_frames_origins, inter_len);
     get_inter_rotational_coords(roll, tilt, twist, theta_e, unit_rotation_vector_e, inter_middle_frames, inter_len);
 
+
+
     free_curves_arrays(theta_a, unit_rotation_vector_a, intra_middle_frames,
                        intra_middle_frames_origins, theta_e, unit_rotation_vector_e,
                        inter_middle_frames);
