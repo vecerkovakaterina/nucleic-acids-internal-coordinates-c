@@ -102,18 +102,20 @@ void write_to_bp_output_file(int pdb_number, char output_path[], double shear[],
  * @param tilt the tilt array
  * @param twist the twist array
  */
-void write_to_bp_step_output_file(int pdb_number, char output_path[], double shift[], double slide[], double rise[], double roll[],
-                             double tilt[], double twist[]){
-    int inter_len = (int)(snapshot_len / 2) - 1;
-    for(int i = 1; i <= inter_len; i++){
+void write_to_bp_step_output_file(int pdb_number, char output_path[], double shift[], double slide[], double rise[],
+                                  double roll[],
+                                  double tilt[], double twist[]) {
+    int inter_len = (int) (snapshot_len / 2) - 1;
+    for (int i = 0; i < inter_len; i++) {
         char filename_output[FILE_PATH_SIZE] = "\0";
-        snprintf(filename_output, FILE_PATH_SIZE, "%s_bp_step_%d.out", output_path, i);
+        snprintf(filename_output, FILE_PATH_SIZE, "%s_bp_step_%d.out", output_path, i + 1);
         char bp_prm_to_append[BUFFER_SIZE] = "\0";
-        snprintf(bp_prm_to_append, BUFFER_SIZE, "%d\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\n", pdb_number, shift[i], slide[i],
+        snprintf(bp_prm_to_append, BUFFER_SIZE, "%d\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\n", pdb_number, shift[i],
+                 slide[i],
                  rise[i], roll[i], tilt[i], twist[i]);
 
         FILE *fp = fopen(filename_output, "a");
-        if (fp == NULL){
+        if (fp == NULL) {
             printf("ERROR: Specified output directory does not exist! %s\n", output_path);
             return;
         }
