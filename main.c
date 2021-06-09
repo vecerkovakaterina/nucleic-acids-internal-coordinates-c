@@ -125,6 +125,113 @@ void write_to_bp_step_output_file(int pdb_number, char output_path[], double shi
 }
 
 /**
+ * Function to create one output file for every snapshot.
+ * Comparable to bp_step.par output file from 3DNA.
+ *
+ * @param pdb_number Number of PDB file being processed
+ * @param output_path output files path
+ * @param shift array
+ * @param slide array
+ * @param rise array
+ * @param roll array
+ * @param tilt array
+ * @param twist array
+ * @param shear array
+ * @param stretch array
+ * @param stagger array
+ * @param buckle array
+ * @param propeller array
+ * @param opening array
+ */
+void
+write_to_test_file(int pdb_number, char output_path[], double shift[], double slide[], double rise[], double roll[],
+                   double tilt[], double twist[], double shear[], double stretch[], double stagger[],
+                   double buckle[], double propeller[], double opening[]) {
+    char filename_output[FILE_PATH_SIZE] = "\0";
+    snprintf(filename_output, FILE_PATH_SIZE, "%s_test_%d.out", output_path, pdb_number);
+    char test_to_append[BUFFER_SIZE] = "\0";
+    snprintf(test_to_append, BUFFER_SIZE,
+             "%d\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\n", pdb_number,
+             shear[0], stretch[0], stagger[0],
+             buckle[0], propeller[0], opening[0], 0.00, 0.00, 0.00, 0.00, 0.00, 0.00);
+
+    FILE *fp = fopen(filename_output, "a");
+    if (fp == NULL) {
+        printf("ERROR: Specified output directory does not exist! %s\n", output_path);
+        return;
+    }
+    fputs(test_to_append, fp);
+
+    int inter_len = snapshot_len / 2 - 1;
+    for (int i = 0; i < inter_len; i++) {
+        char to_append[BUFFER_SIZE] = "\0";
+        snprintf(to_append, BUFFER_SIZE,
+                 "%d\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf\n", pdb_number,
+                 shear[i + 1], stretch[i + 1], stagger[i + 1],
+                 buckle[i + 1], propeller[i + 1], opening[i + 1], shift[i], slide[i], rise[i], roll[i], tilt[i],
+                 twist[i]);
+
+        fputs(to_append, fp);
+    }
+
+
+    fclose(fp);
+}
+
+/**
+ * Free memory allocated for frames and origins arrays.
+ * @param frames_1 array of base frames in strand 1
+ * @param frames_2 array of base frames in strand 2
+ * @param origins_1 array of base frame origins in strand 1
+ * @param origins_2 array of base frame origins in strand 2
+ */
+void free_frames_and_origins(double (*frames_1)[3][3], double (*frames_2)[3][3], double (*origins_1)[3],
+                             double (*origins_2)[3]) {
+    free(frames_1);
+    free(origins_1);
+    free(frames_2);
+    free(origins_2);
+}
+
+/**
+ * Free memory allocated for intra-bp coordinates
+ * @param shear array
+ * @param stretch array
+ * @param stagger array
+ * @param buckle array
+ * @param propeller array
+ * @param opening array
+ */
+void free_intra_coordinates_arrays(double *shear, double *stretch, double *stagger, double *buckle, double *propeller,
+                                   double *opening) {
+    free(shear);
+    free(stretch);
+    free(stagger);
+    free(buckle);
+    free(propeller);
+    free(opening);
+}
+
+/**
+ * Free memory allocated for inter-bp coordinates
+ * @param shift array
+ * @param slide array
+ * @param rise array
+ * @param roll array
+ * @param tilt array
+ * @param twist array
+ */
+void
+free_inter_coordinates_arrays(double *shift, double *slide, double *rise, double *roll, double *tilt, double *twist) {
+    free(shift);
+    free(slide);
+    free(rise);
+    free(roll);
+    free(tilt);
+    free(twist);
+}
+
+/**
  * Run the computation of 3DNA definition of internal coordinates
  * @param filename input pdb file with snapshot
  * @return value computation successful (0) or file not found (1)
