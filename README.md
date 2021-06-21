@@ -18,7 +18,7 @@ The usage of the program is displayed whenever required arguments are not provid
 
 where input file name is a common name for a PDB files numbered 1 to n. And the output file name is a common name for the output files. For example
 
-    ./coordinates -t 3dna -n 10 -i /my_dir/simulation -o /my_other_dir/coordinates
+    $ ./coordinates -t 3dna -n 10 -i /my_dir/simulation -o /my_other_dir/coordinates
 
 would compute base and base step coordinates according to the 3DNA definition for PDB files named simulation.pdb.1 through simulation.pdb.10.
 
